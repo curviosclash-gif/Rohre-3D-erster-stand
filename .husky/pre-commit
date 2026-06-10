@@ -7,9 +7,12 @@ fi
 
 npm run guard:main
 
-# NEU: Scope & Lock Validation
-echo "Validiere Phase-Scope und Lock-Status..."
-node .agents/scripts/lock-registry-merger.js --validate
+# Lock-Validierung ist opt-in (nur Multi-Agent-/Team-Betrieb, siehe .agents/workflows/teamwork-coordination.md).
+# Single-Agent-Default: keine Lock-Pflicht. Bei Bedarf: npm run lock:validate
+if echo "$(git diff --cached --name-only)" | grep -q "^docs/lock-status/"; then
+  echo "Lock-Dateien staged - validiere Lock-Registry..."
+  node .agents/scripts/lock-registry-merger.js --validate
+fi
 
 # Block commits that mix Umsetzungsplan with code changes.
 STAGED=$(git diff --cached --name-only)

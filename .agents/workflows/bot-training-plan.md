@@ -35,21 +35,10 @@ outputs:
 
 ## 2. Claim block
 
-- Find first free or explicitly claimable block/phase in `docs/bot-training/Bot_Trainingsplan.md`.
+- Find first open block/phase in `docs/bot-training/Bot_Trainingsplan.md`.
 - Verify hard dependencies are completed.
-- Operativer Lock-Wahrheitsraum bleibt `docs/lock-status/*.json`, nicht der reine Plantext.
-- BT-Locks deshalb ueber `docs/lock-status/<person>.json` festhalten und danach `npm run lock:validate` ausfuehren.
-- Lock-only Claim-Commits sind nicht Default; wenn moeglich Lock-Aenderung mit der ersten fachlichen Lieferung oder einem gezielten Sync-Commit buendeln.
-- Falls der Team-Flow einen sofort publizierten Claim auf `main` braucht:
-
-```bash
-npm run guard:main
-git add docs/lock-status/<person>.json
-npm run agent:commit -- --message="chore: claim BT block <BTXX phase>" --workflow=bot-training-plan --decision=D3 --evidence="npm run plan:check -> PASS" --gate="<explizite User-Freigabe>" --residual-risk="<Restrisiko>" --not-checked="<nicht geprueft>"
-npm run snapshot:tag
-git push
-```
-
+- Single-Agent-Default: kein Lock-Claim noetig; der gewaehlte Block wird einfach bearbeitet.
+- Lock-Tooling (`docs/lock-status/<person>.json`, `npm run lock:validate`) nur opt-in bei explizitem Multi-Agent-/Team-Betrieb verwenden (siehe `.agents/workflows/teamwork-coordination.md`).
 - Plantext in `docs/bot-training/Bot_Trainingsplan.md` nur anpassen, wenn sich Status, Evidence, Risiken oder Freigabe wirklich geaendert haben; kein Claim nur per Plan-Edit.
 
 ## 3. Plan execution
@@ -74,7 +63,7 @@ git push
 - Remove `implementation_plan.md`.
 - Commit scoped changes im selben Turn, sobald der bearbeitete Trainings-Slice verifiziert abgeschlossen ist.
 - Before push on `main`: `npm run snapshot:tag`.
-- When block is complete, release the operational BT lock in `docs/lock-status/*.json` and keep the bot-training plan status/evidence aligned.
+- When block is complete, keep the bot-training plan status/evidence aligned; nur bei opt-in Team-Betrieb zusaetzlich den BT-Lock in `docs/lock-status/*.json` releasen.
 
 ## 6. Mandatory closure checks
 

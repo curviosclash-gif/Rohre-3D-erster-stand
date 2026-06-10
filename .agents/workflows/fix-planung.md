@@ -29,13 +29,10 @@ outputs:
 - Select the claimed `VXX` block from `docs/Umsetzungsplan.md`.
 - Execute only blocks already manually integrated by the user.
 - Do not create new blocks or planning scopes directly in master plans.
-- Find first block whose lock status is `frei` and whose hard dependencies are fulfilled.
-- Operativer Lock-Wahrheitsraum ist `docs/lock-status/*.json`.
-- Claim ueber Lock-Tooling statt Masterplan-Edit:
-  - `npm run lock:claim VXX <person> -- --phase=<VXX.Y.Z> --target="YYYY-MM-DD"`
-  - danach `npm run lock:validate`
+- Find first block whose hard dependencies are fulfilled.
+- Single-Agent-Default: kein Lock-Claim noetig; der gewaehlte Block wird einfach bearbeitet.
+- Lock-Tooling (`lock:claim`/`lock:validate`, `docs/lock-status/*.json`) nur opt-in bei explizitem Multi-Agent-/Team-Betrieb verwenden (siehe `.agents/workflows/teamwork-coordination.md`).
 - Bot-training-Claims laufen nicht ueber diesen Pfad; dafuer `/bot-training-plan` verwenden.
-- Lock-only Claim-Commits sind nicht mehr Default; Lock-Aenderungen werden mit der ersten fachlichen Lieferung oder einem gezielten Sync-Commit gebuendelt.
 - If no free block exists: report `Kein freier Block` and stop.
 - Treat `scope_files` in `docs/plaene/aktiv/VXX.md` as canonical ownership for claimed scope.
 
@@ -76,10 +73,9 @@ outputs:
 
 ## 5. Release block
 
-- Lock erst releasen, nachdem der zugehoerige Delivery-Slice commitet oder ein expliziter Abschluss-Blocker dokumentiert wurde.
-- Lock ueber `npm run lock:release VXX <person>` freigeben und `npm run lock:validate` laufen lassen.
+- Single-Agent-Default: kein Lock-Release noetig; Blockabschluss wird ueber Plan-Status, Evidence und Commit dokumentiert.
+- Nur bei opt-in Team-Betrieb: Lock ueber `npm run lock:release VXX <person>` freigeben und `npm run lock:validate` laufen lassen.
 - Master-Lock-Tabelle ist ein synchronisierter Index, nicht der operative Claim-/Release-Mechanismus.
-- Lock-only Release-Commits sind nicht verpflichtend.
 
 ## Report
 

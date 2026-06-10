@@ -11,6 +11,9 @@ outputs:
   - repo-change
 ---
 
+> **Opt-in only:** Dieser Workflow (und das gesamte Lock-/Claiming-System) gilt nur fuer expliziten Multi-Agent-/Team-Betrieb.
+> Im Single-Agent-Default wird ohne Claiming, Locking und Lock-Pflege-Commits gearbeitet (siehe `.agents/rules/git_and_commits.md`, Scope & Phase Validation).
+
 ## Workflow fuer zwei Personen (Alice & Bob)
 
 ### Vor Blockstart

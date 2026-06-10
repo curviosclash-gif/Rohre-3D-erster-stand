@@ -65,6 +65,13 @@ Jede Freigabefrage muss fuer den User ohne Rueckfrage entscheidbar sein. Sie nen
 
 Agenten stoppen und fragen nach, wenn Graph, Master, Findings oder Locks widersprechen, ein unerwartetes Gate rot wird, der Diff groesser als angekuendigt wird, fremde uncommittete Aenderungen in betroffenen Dateien liegen, getrackte Dateien geloescht/verschoben wuerden, ein Cleanup-Skript mehr Klassen trifft als angekuendigt, ein Refactor produktive Parameter/Physik/Bot-Training/Recording/Multiplayer beruehrt oder ein Rebuild-/Reborn-Pfad entstehen soll.
 
+## Plan-Autopilot (V145): Report-only
+
+- Der Plan-Autopilot ist auf den Report-/Plan-Modus eingefroren: erlaubt ist nur `npm run autopilot:plan` (Dry-Run/Report).
+- Der Live-Executor (`node scripts/plan-autopilot.mjs run`) ist nicht freigegeben; das npm-Script `autopilot:run` wurde bewusst entfernt (Entscheidung 2026-06-10, Begruendung: in 3 Wochen nie produktiv genutzt, Preconditions blockieren echte Automation).
+- Eine Reaktivierung des Live-Executors ist eine `D3`-Entscheidung mit User-Gate und braucht zuerst eine Lockerung der Preconditions plus einen dokumentierten Probelauf.
+- Code und Contract-Tests (`scripts/plan-autopilot.mjs`, `tests/plan-autopilot.contract.test.mjs`) bleiben erhalten und gewartet, solange der Report-Modus genutzt wird.
+
 ## Subagent and Parallel Agent Use
 
 - Subagents oder Parallel-Agenten duerfen nur eingesetzt werden, wenn der User sie explizit erlaubt oder anfragt; normale Tool-Parallelisierung bleibt davon unberuehrt.

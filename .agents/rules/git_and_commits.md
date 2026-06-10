@@ -25,6 +25,7 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 - On Windows before staging, run `npm run git:acl:heal` once per commit cycle to clear recurring `.git/index.lock` ACL denies.
 - Stage only scoped files (`git add [files]`); verify staged scope via `git diff --cached --name-only` and remaining worktree changes via `git status --short`. Niemals `git add .` oder `git add -A`.
 - Agent-Commits laufen ueber `npm run agent:commit -- --message="..." --workflow=<name> --decision=<D0-D4> --evidence="<command> -> PASS" ...`; der Wrapper leitet `Scope` und `Known-uncommitted` aus dem Git-Index ab, validiert denselben Envelope wie der Commit-Hook und staged keine Dateien selbst.
+- Der V138-Diff-Audit (`scripts/check-ai-diff-audit.mjs`) ist Teil des `agent:commit`-Preflights und blockiert bei Violations (Exit 1). Er ist damit fuer alle Agent-Commits durchgesetzt; manuelle User-Commits sind bewusst ausgenommen (kein Envelope vorhanden). Manueller Lauf: `npm run check:ai-diff-audit`.
 - Commits folgen fachlichen Delivery-Slices: zusammengehoerige Aenderungen (`code + passende tests + minimale scope-doku`) duerfen und sollen in einem scoped Commit landen.
 - Sobald eine Aufgabe, Subphase oder ein Workflow nach Verifikation fachlich abgeschlossen ist und geaenderte Repo-Dateien im Scope vorliegen, wird im selben Turn standardmaessig commitet.
 - Kein bewusst offen gelassener eigener Worktree am Task-Ende, ausser der User fordert explizit nur Vorarbeit ohne Commit an, es fehlt noch notwendige Verifikation, oder mehrere Aenderungsstraenge sind noch nicht sauber trennbar.
@@ -40,7 +41,8 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 
 ## Scope & Phase Validation
 
-- Vor jedem Commit: `npm run scope:validate` empfohlen.
-- Scope-Violations sind Hard-Fails (pre-commit Hook via lock-registry-merger).
-- Lock-Status wird in `docs/lock-status/` verwaltet (distributed, pro Person).
+- Default ist Single-Agent-Betrieb: kein Claiming, kein Locking, keine Lock-Pflege-Commits.
+- Das Lock-Tooling (`lock:claim`, `lock:release`, `lock:advance`, `lock:validate`, `docs/lock-status/`) ist opt-in und nur fuer expliziten Multi-Agent-/Team-Betrieb gedacht (siehe `.agents/workflows/teamwork-coordination.md`).
+- Der pre-commit Hook validiert Locks nur noch, wenn `docs/lock-status/`-Dateien selbst staged sind.
+- Scope-Disziplin bleibt: nur Dateien aus dem aktiven Block-/Task-Scope anfassen; `scope_files` in `docs/plaene/aktiv/VXX.md` sind die kanonische Ownership-Quelle.
 - Phase-Sequenzierung wird von `phase:validate` unterstuetzt.
