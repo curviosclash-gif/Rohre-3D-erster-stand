@@ -9,7 +9,7 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 ## Archivierungsabgleich 2026-06-11 (V76, V140, V141)
 
 - Nach User-Gate (Intake-Entwurf `docs/plaene/neu/Handlungsempfehlungen_Meta_Quote_Reduktion.md`, Punkt 3.3) wurden `V76`, `V140` und `V141` aus den Master-Tabellen (Aktive Bloecke, Abhaengigkeiten, Lock-Status, Arbeitsstrom-Index) entfernt; die Sektion "Abgeschlossene Bloecke (offener Abgleich vor Archivierung)" ist damit leer und wurde aufgeloest.
-- `V140.md` liegt jetzt unter `docs/plaene/alt/`. `V76.md` und `V141.md` bleiben als `protected-dependency-source` unter `docs/plaene/aktiv/`, weil `V113` von `V76.99` und `V145` von `V141.99` abhaengen und `plan:index:check` Dependency-Ziele nur im Master oder unter `aktiv/` aufloest.
+- `V140.md` liegt jetzt unter `docs/plaene/alt/`. Zum Zeitpunkt dieses Slices blieben `V76.md` und `V141.md` als `protected-dependency-source` unter `docs/plaene/aktiv/`, weil `V113` von `V76.99` und das damals noch im Master gefuehrte `V145` von `V141.99` abhing; die direkt folgende V145-Archivierung entfernte diesen letzten Master-Dependent von V141.
 - Zusaetzlich wurde der stale Findings-Index neu gebaut (`npm run findings:index:build`, 6 Findings).
 - Evidence: `npm run plan:check` -> PASS; `npm run plan:index:build` -> 46 Bloecke; `npm run plan:index:check` -> PASS; `npm run plan:context:check` -> PASS mit `drift_status=clean`, `violations=0` (vorher 4 Index-Violations).
 - Residual-risk: Abschluss-Historie von V76/V140/V141 ist nur noch ueber dieses Changelog, die Detailakten und `git log` nachvollziehbar, nicht mehr ueber Master-Tabellenzeilen.
@@ -17,13 +17,20 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 
 ## Archivierungsabgleich 2026-06-11 (V145)
 
-- Nach User-Gate (Optionen "1 und 3" aus der V145-Tiefenanalyse 2026-06-11) wurde `V145` aus den Master-Tabellen (Aktive Bloecke, Abhaengigkeiten, Lock-Status, Arbeitsstrom-Index) entfernt; `V145.md` liegt jetzt unter `docs/plaene/alt/`.
+- Nach User-Gate (Optionen "1 und 3" aus der V145-Tiefenanalyse 2026-06-11) wurde `V145` aus den Master-Tabellen (Aktive Bloecke, Abhaengigkeiten, Lock-Status, Arbeitsstrom-Index) entfernt; `V145.md` liegt jetzt unter `docs/plaene/alt/`. Die Abschlussnotiz wurde in `3206cff4` einen Commit vor der eigentlichen Archivierung vorbereitet; die Master-/Index-Aenderung und der Move folgten in `49df5c91`.
 - Vorab wurde eine Drift-Notiz in `V145.md` committet (`62eb3f5b`): Executor-Freeze durch `24891ff2` (Report-only-Regel in `.agents/rules/planning_and_governance.md`), Post-Closure-Haertung `cbc34c9b` (`validatePostWorkerGitState`, schliesst DoD.8-Restluecke) und korrigierte Zeilenzahl (1331 -> 1508).
 - Kein Block haengt von `V145.99` ab; `V141.md` bleibt vorerst als `protected-dependency-source` unter `aktiv/`, verliert mit dieser Archivierung aber seinen letzten Master-Dependent und kann bei naechster Gelegenheit ebenfalls archiviert werden.
 - Entscheidung zur systemischen Luecke (Post-Closure-Drift auf scope_files geschlossener Plaene): bewusst kein neues Pre-commit-Gate (Meta-Quote-Reduktion); Schutz bleibt die Notizpflicht aus `.agents/rules/code_quality_and_debugging.md`.
 - Evidence: `npm run plan:check` -> PASS; `npm run plan:index:build` + `plan:index:check` -> PASS; `npm run plan:context:check` -> PASS; `npm run plan:changelog:check` -> PASS.
 - Residual-risk: V145-Abschluss-Historie ist nur noch ueber dieses Changelog, `docs/plaene/alt/V145.md` und `git log` nachvollziehbar.
 - Not-checked: keine Produktcode-Aenderung, keine Vollsuite; parallel laufender Fremdscope (V90-Audit, agent-context) wurde nicht angefasst.
+
+## Repo-Fix 2026-06-11 (Plan-/Evidence-Drift aus 15-Stunden-Gitreview)
+
+- V145-Archivierungsreihenfolge und Report-only-Status sind in Changelog und Master explizit; der Wissensgraph wird aus dem archivierten Pfad neu erzeugt.
+- V90/P21 nennt fuer den Server den tatsaechlich installierten Stand `ws@8.21.0`; der abweichende historische Commit-Titel bleibt als korrigierter Evidence-Hinweis nachvollziehbar.
+- Evidence: `npm run gates:pre-commit` -> PASS; `npm run plan:index:check` und `npm run plan:context:check` -> PASS; `npm run graph:check` -> PASS.
+- Not-checked: keine Produkt-, Electron-App-, Playwright- oder Vollsuite-Pfade; die dokumentierten zehn Electron-Advisories bleiben im separaten V146-Intake.
 
 ## V143 Planungsschaerfung 2026-06-09 (tokenarme Gemini-Modell-Auslagerung)
 
@@ -1193,7 +1200,7 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 - P21-Wiedervorlage (vorgezogen vom 2026-06-17) per User-Auftrag mit D3-Freigabe fuer Package-/Lockfile-Aenderungen ausgefuehrt; Details im neuen Audit-Snapshot 2026-06-11 in `docs/plaene/aktiv/V90.md`.
 - Dependabot-Triage: keine criticals reproduzierbar (API: 14 open = 1 high, 5 medium, 8 low; davon 12 `torch`-Alerts in `python/requirements*.txt` ausserhalb des npm-/P21-Scopes, eigener Intake noetig). Kein P1-Runtime-Befund.
-- Drei Fix-Slices committet: non-force `npm audit fix` fuer Root und Electron (`951b318f`), Server `ws@8.20.1` (`e2e2d5c7`), `vite@6.4.2` als 90.3.1 Option A (`4077850e`). Ergebnis: Root 4 -> 0, Server 1 -> 0, Electron 12 -> 10 (alle Reste Major-gebunden an `electron@42`/`electron-builder@26.15`).
+- Drei Fix-Slices committet: non-force `npm audit fix` fuer Root und Electron (`951b318f`), Server `ws@8.21.0` (`e2e2d5c7`; Commit-Titel nennt irrtuemlich `8.20.1`), `vite@6.4.2` als 90.3.1 Option A (`4077850e`). Ergebnis: Root 4 -> 0, Server 1 -> 0, Electron 12 -> 10 (alle Reste Major-gebunden an `electron@42`/`electron-builder@26.15`).
 - P21-Scope in `docs/prozess/Open_Findings.md` auf den Electron-Tree reduziert; neue Wiedervorlage 2026-07-11 oder frueher bei non-force Fix-Verfuegbarkeit.
 - Evidence: `npm audit`/`npm --prefix electron audit`/`npm --prefix server audit` vorher/nachher, `npm run build` inkl. `architecture:guard` -> PASS, Dev-Server-Smoke `npm run dev` -> HTTP 200.
 - Residual-risk: Electron-Reste bleiben dokumentierte Ausnahme; Vite-6-Dev-Warmup zeigte einmalig mehrminuetigen CPU-Spin nach dem ersten Request, danach stabil.

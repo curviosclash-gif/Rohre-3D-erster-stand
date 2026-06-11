@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "updated": "2026-06-10",
+  "updated": "2026-06-11",
   "start_anchor": {
-    "block": "V145",
-    "phase": "145.99",
+    "block": "V131",
+    "phase": "131.4",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {

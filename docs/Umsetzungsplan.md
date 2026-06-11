@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-10. Aktiver Lock: `-`; Startanker: `V145 145.99 abgeschlossen`; offene Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V142`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V131`-Funktionsslice, `V118`-Architektur-Proof oder V142-Graph-Drift-Folgearbeit.
+Stand: 2026-06-11. Aktiver Lock: `-`; Startanker: `V131 131.4 aktiv`; `V145` ist archiviert; offene Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V142`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V131`-Funktionsslice, `V118`-Architektur-Proof oder V142-Graph-Drift-Folgearbeit.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -249,7 +249,7 @@ Priorisierungsabgleich 2026-06-09: V140 und V141 sind abgeschlossen. Funktionale
 5. `V141` ist als WARN-Pilot abgeschlossen: Finding-/Plan-/Doku-Drift wird sichtbar, aber weder Findings noch Source-of-Truth-Entscheidungen werden automatisch geaendert.
 6. `V142` kann nun Graph-Generated-Gate und CI/Hook-Schutz auf Basis der kalibrierten Driftklassen haerten.
 7. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
-8. `V145` ist als separater Plan-Autopilot-MVP abgeschlossen: Dry-run, Parser, Parking-Logik, Fake-Executor und Worker-Contract sind gruen; echte Live-Runs bleiben Ein-Slice-Handoffs mit sauberem Worktree und Review.
+8. `V145` ist als separater Plan-Autopilot-MVP abgeschlossen und archiviert: Dry-run, Parser, Parking-Logik, Fake-Executor und Worker-Contract sind historische Abschluss-Evidence; produktiv erlaubt ist nur `npm run autopilot:plan`, der Live-Executor bleibt per Governance eingefroren.
 9. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
 
 ## Conflict-Log

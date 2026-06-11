@@ -186,19 +186,19 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2153,
-    "rawCoveredFileCount": 1395,
+    "trackedFileCount": 2157,
+    "rawCoveredFileCount": 1397,
     "rawCoveragePercent": 64.8,
-    "adjustedTrackedFileCount": 1461,
-    "adjustedCoveredFileCount": 1156,
+    "adjustedTrackedFileCount": 1462,
+    "adjustedCoveredFileCount": 1157,
     "adjustedCoveragePercent": 79.1,
-    "uncoveredFileCount": 758,
+    "uncoveredFileCount": 760,
     "uncoveredActiveFileCount": 305,
     "classifications": [
       {
         "classification": "agent-workflow",
         "excludedFromCoverage": true,
-        "count": 19,
+        "count": 21,
         "coveredCount": 11
       },
       {
@@ -222,8 +222,8 @@
       {
         "classification": "bot-training",
         "excludedFromCoverage": true,
-        "count": 219,
-        "coveredCount": 43
+        "count": 220,
+        "coveredCount": 44
       },
       {
         "classification": "dev-tooling",
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 345,
-        "coveredCount": 193
+        "count": 346,
+        "coveredCount": 194
       },
       {
         "classification": "prototype",
@@ -773,6 +773,32 @@
     },
     {
       "path": ".agents/workflows/release.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "agent-workflow",
+      "excludedFromCoverage": true,
+      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
+    },
+    {
+      "path": ".agents/workflows/repo-fix.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "agent-workflow",
+      "excludedFromCoverage": true,
+      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
+    },
+    {
+      "path": ".agents/workflows/repro-analyse.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
@@ -12418,24 +12444,6 @@
       "excludeReason": null
     },
     {
-      "path": "docs/plaene/aktiv/V145.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V145",
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -14076,6 +14084,23 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/alt/V145.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/alt/V74.md",
       "tracked": true,
       "coveredInCore": true,
@@ -14997,6 +15022,23 @@
       "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
     },
     {
+      "path": "docs/plaene/neu/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "bot-training",
+      "excludedFromCoverage": true,
+      "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
+    },
+    {
       "path": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
       "tracked": true,
       "coveredInCore": true,
@@ -15067,6 +15109,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Electron_Major_Security_Slice_V146.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,

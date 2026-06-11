@@ -2580,13 +2580,11 @@
       "status": "done",
       "attributes": {
         "source": [
-          "block-plan",
-          "master-index"
+          "block-plan"
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "145.99",
-        "planFile": "docs/plaene/aktiv/V145.md",
+        "planFile": "docs/plaene/alt/V145.md",
         "scopeDeclarations": [
           "data/contracts/plan-autopilot-worker-output.v1.json",
           "docs/generated/knowledge-graph.coverage.json",
@@ -2601,8 +2599,8 @@
           "tests/plan-autopilot.contract.test.mjs"
         ],
         "scopeResolution": {
-          "concreteCount": 11,
-          "plannedCount": 0
+          "concreteCount": 10,
+          "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
         "unknownFrontmatterFields": [
@@ -3322,7 +3320,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 358,
+          "concreteCount": 360,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -36190,10 +36188,9 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V145",
-          "V77"
+          "V145"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -37697,6 +37694,21 @@
       }
     },
     {
+      "id": "docs/plaene/alt/V145.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/alt/V74.md",
       "type": "file",
       "title": null,
@@ -38512,6 +38524,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
       "type": "file",
       "title": null,
@@ -38574,6 +38601,21 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/neu/Feature_Electron_Major_Security_Slice_V146.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -56604,7 +56646,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": false
+        "exists": true
       }
     },
     {
@@ -95571,16 +95613,15 @@
       "from": "V145",
       "to": "V116",
       "type": "depends_on",
-      "source": "merged",
-      "hard": true,
-      "fulfilled": true,
-      "hint": "Kontextreduktion, AI-Gates, Plan-Index, Plan-Map, Diff-Audit und Drift-Pilot begrenzen den gate-sicheren Autopilot-MVP",
+      "source": "frontmatter",
+      "hard": false,
+      "fulfilled": false,
+      "hint": null,
       "attributes": {
         "dependsPhase": "116.99",
         "rawToken": "V116.99",
         "sourceBreakdown": [
-          "frontmatter",
-          "master-table"
+          "frontmatter"
         ],
         "canonicalToken": true
       }
@@ -95589,7 +95630,7 @@
       "from": "V145",
       "to": "V117",
       "type": "depends_on",
-      "source": "merged",
+      "source": "frontmatter",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -95597,8 +95638,7 @@
         "dependsPhase": "117.99",
         "rawToken": "V117.99",
         "sourceBreakdown": [
-          "frontmatter",
-          "master-table"
+          "frontmatter"
         ],
         "canonicalToken": true
       }
@@ -95607,7 +95647,7 @@
       "from": "V145",
       "to": "V123",
       "type": "depends_on",
-      "source": "merged",
+      "source": "frontmatter",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -95615,8 +95655,7 @@
         "dependsPhase": "123.99",
         "rawToken": "V123.99",
         "sourceBreakdown": [
-          "frontmatter",
-          "master-table"
+          "frontmatter"
         ],
         "canonicalToken": true
       }
@@ -95625,7 +95664,7 @@
       "from": "V145",
       "to": "V134",
       "type": "depends_on",
-      "source": "merged",
+      "source": "frontmatter",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -95633,8 +95672,7 @@
         "dependsPhase": "134.99",
         "rawToken": "V134.99",
         "sourceBreakdown": [
-          "frontmatter",
-          "master-table"
+          "frontmatter"
         ],
         "canonicalToken": true
       }
@@ -95643,7 +95681,7 @@
       "from": "V145",
       "to": "V138",
       "type": "depends_on",
-      "source": "merged",
+      "source": "frontmatter",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -95651,8 +95689,7 @@
         "dependsPhase": "138.99",
         "rawToken": "V138.99",
         "sourceBreakdown": [
-          "frontmatter",
-          "master-table"
+          "frontmatter"
         ],
         "canonicalToken": true
       }
@@ -95661,7 +95698,7 @@
       "from": "V145",
       "to": "V141",
       "type": "depends_on",
-      "source": "merged",
+      "source": "frontmatter",
       "hard": false,
       "fulfilled": false,
       "hint": null,
@@ -95669,8 +95706,7 @@
         "dependsPhase": "141.99",
         "rawToken": "V141.99",
         "sourceBreakdown": [
-          "frontmatter",
-          "master-table"
+          "frontmatter"
         ],
         "canonicalToken": true
       }
@@ -106455,15 +106491,6 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/aktiv/V145.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -107310,6 +107337,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/alt/V145.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/alt/V74.md",
       "type": "scope",
       "hint": null,
@@ -107787,6 +107823,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/neu/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
       "type": "scope",
       "hint": null,
@@ -107824,6 +107869,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Electron_Major_Security_Slice_V146.md",
       "type": "scope",
       "hint": null,
       "attributes": {
