@@ -992,31 +992,6 @@
         "target": "Geplant",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
-    },
-    {
-      "id": "V145",
-      "title": "Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung",
-      "status": "done",
-      "priority": "P2",
-      "owner": "frei",
-      "workstream": "ai-graph-tools",
-      "depends_on": [
-        "V116.99",
-        "V117.99",
-        "V123.99",
-        "V134.99",
-        "V138.99",
-        "V141.99"
-      ],
-      "current_phase": "145.99",
-      "plan_file": "docs/plaene/aktiv/V145.md",
-      "lock": {
-        "status": "closed",
-        "agent": "-",
-        "start_date": "2026-06-10",
-        "target": "Abgeschlossen 2026-06-10; Dry-run-/Parking-/Fake-Executor-/Worker-Contract-MVP gruen, Live-Run nur sauberer Ein-Slice-Handoff",
-        "source": "docs/Umsetzungsplan.md#lock-status"
-      }
     }
   ]
 }

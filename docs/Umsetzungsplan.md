@@ -33,7 +33,7 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | Android / Mobile | `V131`, `V132`, `V135` | Mobile-Classic-Steuerung, Android Arcade-Parcours, Mobile-Menue-UX und God-File-Sunset fuer produktive Mobile-/Android-Folgearbeit. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V118`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface, UI-/Runtime-Entflechtung und Architektur-Gates. |
 | Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V142`, `V144` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift- und Source-of-Truth-Gates. |
-| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143`, `V145` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core, AI-Kontext und Plan-Autopilot. |
+| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core, AI-Kontext und Plan-Autopilot. |
 
 ## Aktive Bloecke
 
@@ -91,7 +91,6 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V142 | Graph-Drift-Guard-Automatisierung | planned | P2 | frei | V94.99,V116.99,V123.99,V138.99 | 142.1 | `docs/plaene/aktiv/V142.md` |
 | V143 | Agent-Skills statt Regeltext fuer Spezialroutinen | planned | P2 | frei | V116.99 | 143.1 | `docs/plaene/aktiv/V143.md` |
 | V144 | Future-Entscheidung JSON als Plan-Source-of-Truth | planned | P2 | frei | V123.99 | 144.1 | `docs/plaene/aktiv/V144.md` |
-| V145 | Plan-Autopilot fuer gate-sichere Subphasen-Automatisierung | done | P2 | frei | V116.99,V117.99,V123.99,V134.99,V138.99,V141.99 | 145.99 | `docs/plaene/aktiv/V145.md` |
 
 ## Abhaengigkeiten
 
@@ -185,7 +184,6 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V143 | V116.99 | hard | ja | Repo-Kontext-Reduktion ist Baseline fuer Agent-Skill-Auslagerung |
 | V144 | V123.99 | hard | ja | V123-Option-A-Entscheidung ist Voraussetzung fuer spaetere Source-of-Truth-Neubewertung |
 | V144 | V120.99,V134.99 | soft | ja | Graph-RAG- und Plan-Map-Piloten liefern Vergleichssignale fuer strukturierte Planpflege |
-| V145 | V116.99,V117.99,V123.99,V134.99,V138.99,V141.99 | hard | ja | Kontextreduktion, AI-Gates, Plan-Index, Plan-Map, Diff-Audit und Drift-Pilot begrenzen den gate-sicheren Autopilot-MVP |
 
 ## Lock-Status
 
@@ -239,7 +237,6 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V142 | - | frei | Geplant |
 | - | V143 | - | frei | Geplant |
 | - | V144 | - | frei | Geplant |
-| - | V145 | 2026-06-10 | closed | Abgeschlossen 2026-06-10; Dry-run-/Parking-/Fake-Executor-/Worker-Contract-MVP gruen, Live-Run nur sauberer Ein-Slice-Handoff |
 
 ## Empfohlene Reihenfolge
 
