@@ -1835,6 +1835,11 @@ async function pathExists(relativePath) {
     }
 }
 
+function resolveGraphFileExists(relativePath, trackedFileSet) {
+    const normalizedPath = normalizeRepoPath(relativePath);
+    return trackedFileSet instanceof Set && trackedFileSet.has(normalizedPath);
+}
+
 function buildGraphFileCoverageIndex(graph) {
     const nodes = Array.isArray(graph.nodes) ? graph.nodes : [];
     const edges = Array.isArray(graph.edges) ? graph.edges : [];
@@ -2715,9 +2720,9 @@ async function buildKnowledgeGraphModel() {
     const allNodes = nodes.values();
     for (const node of allNodes) {
         if (node.type !== 'file') continue;
-        // eslint-disable-next-line no-await-in-loop
-        const exists = await pathExists(node.id);
-        node.attributes.exists = exists;
+        // The graph input index excludes ignored files, so committed artifacts stay
+        // independent of developer-local reports under tmp/ and similar paths.
+        node.attributes.exists = resolveGraphFileExists(node.id, trackedFileSet);
     }
 
     const sortedNodes = sortNodes(allNodes);
@@ -2831,6 +2836,7 @@ export {
     parseAuditMasterRows,
     parseAuditFindingsMetadata,
     parseGuardMatrix,
+    resolveGraphFileExists,
     resolveScopeEntries,
 };
 

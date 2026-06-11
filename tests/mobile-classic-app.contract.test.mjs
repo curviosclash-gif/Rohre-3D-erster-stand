@@ -36,6 +36,7 @@ import {
 import {
   TILT_CONTROL_STATES,
   TouchTiltSensorLifecycle,
+  resolveScreenOrientationAngle,
 } from '../src/ui/touch/TouchTiltSensorLifecycle.js';
 import {
   DEFAULT_MOBILE_CLASSIC_CONTROLS,
@@ -44,6 +45,7 @@ import {
   normalizeMobileClassicControlSettings,
 } from '../src/shared/contracts/MobileClassicControlsContract.js';
 import { PlayerController } from '../src/entities/player/PlayerController.js';
+import { PlayerInputSystem } from '../src/entities/systems/PlayerInputSystem.js';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -736,6 +738,39 @@ test('Mobile Classic tilt lifecycle models calibrating, active, fallback and re-
   assert.equal(unsupportedLifecycle.resolveControlState({ fresh: false }), TILT_CONTROL_STATES.UNSUPPORTED);
 });
 
+test('Mobile Classic tilt lifecycle canonicalizes legacy negative orientation angles', () => {
+  let nowMs = 200000;
+  const fakeWindow = {
+    DeviceOrientationEvent: function DeviceOrientationEvent() {},
+    orientation: -90,
+    addEventListener() {},
+    removeEventListener() {},
+  };
+  const lifecycle = new TouchTiltSensorLifecycle({
+    getWindow: () => fakeWindow,
+    now: () => nowMs,
+  });
+
+  assert.equal(resolveScreenOrientationAngle(fakeWindow), 270);
+  assert.equal(lifecycle.startListening({ auto: true }), true);
+  for (let index = 0; index < 9; index += 1) {
+    nowMs += 80;
+    lifecycle.handleOrientation({ beta: 21, gamma: 1 });
+  }
+  assert.equal(lifecycle.state.neutralOrientationAngle, 270);
+  assert.equal(lifecycle.calibration.active, false);
+
+  nowMs += 80;
+  lifecycle.handleOrientation({ beta: 21, gamma: 1 });
+  assert.equal(lifecycle.calibration.active, false);
+
+  fakeWindow.orientation = 90;
+  nowMs += 80;
+  lifecycle.handleOrientation({ beta: 1, gamma: -20 });
+  assert.equal(lifecycle.calibration.active, true);
+  assert.equal(lifecycle.calibration.reason, 'orientation-change');
+});
+
 test('Mobile Classic tilt UI guides neutral hold, fallback and re-calibration', () => {
   const container = createTouchElement({ id: 'touch-controls' });
   const tiltStatus = createTouchElement();
@@ -827,11 +862,35 @@ test('Mobile Classic touch path has pause and edge-triggered item actions', () =
   const secondPoll = source.poll();
 
   assert.equal(firstPoll.shootItem, true);
-  assert.equal(firstPoll.useItem, 0);
+  assert.equal(firstPoll.useItem, true);
   assert.equal(firstPoll.nextItem, true);
   assert.equal(secondPoll.shootItem, false);
-  assert.equal(secondPoll.useItem, -1);
+  assert.equal(secondPoll.useItem, false);
   assert.equal(secondPoll.nextItem, false);
+
+  const player = {
+    index: 0,
+    isBot: false,
+    inventory: [{}],
+    selectedItemIndex: 0,
+  };
+  const playerInputSystem = new PlayerInputSystem({
+    humanPlayers: [player],
+    renderer: {
+      cameraModes: [],
+      cycleCamera() {},
+    },
+  });
+  let currentTouchInput = firstPoll;
+  const inputManager = {
+    getPlayerInput() {
+      return currentTouchInput;
+    },
+  };
+  assert.equal(playerInputSystem.resolvePlayerInput(player, 1 / 60, inputManager).useItem, 0);
+  currentTouchInput = secondPoll;
+  assert.equal(playerInputSystem.resolvePlayerInput(player, 1 / 60, inputManager).useItem, -1);
+
   assert.equal(source._requestPause(), true);
   assert.equal(source._requestPause(), false);
   assert.equal(pauseCount, 1);

@@ -3320,7 +3320,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 360,
+          "concreteCount": 361,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -38781,6 +38781,21 @@
       }
     },
     {
+      "id": "docs/plaene/neu/Feature_Plan_Autopilot_Isolierter_Ein_Slice_Pilot_V147.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/neu/Feature_Plan_Index_JSON_Source_of_Truth_Migration_B_Entscheidung.md",
       "type": "file",
       "title": null,
@@ -56646,7 +56661,7 @@
         "scopeBlocks": [
           "V116"
         ],
-        "exists": true
+        "exists": false
       }
     },
     {
@@ -107968,6 +107983,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Mobile_God_File_Sunset_V140.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/neu/Feature_Plan_Autopilot_Isolierter_Ein_Slice_Pilot_V147.md",
       "type": "scope",
       "hint": null,
       "attributes": {

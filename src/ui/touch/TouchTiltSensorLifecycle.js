@@ -42,10 +42,10 @@ export function resolveScreenOrientationAngle(ownerWindow = resolveDefaultWindow
     if (!ownerWindow) return 0;
     const screenAngle = Number(ownerWindow.screen?.orientation?.angle);
     if (Number.isFinite(screenAngle)) {
-        return screenAngle;
+        return normalizeOrientationAngle(screenAngle);
     }
     const legacyAngle = Number(ownerWindow.orientation);
-    return Number.isFinite(legacyAngle) ? legacyAngle : 0;
+    return Number.isFinite(legacyAngle) ? normalizeOrientationAngle(legacyAngle) : 0;
 }
 
 export class TouchTiltSensorLifecycle {

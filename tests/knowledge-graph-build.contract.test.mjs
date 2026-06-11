@@ -16,6 +16,7 @@ import {
     parseDependencyToken,
     parseFrontmatter,
     parseMasterRows,
+    resolveGraphFileExists,
     resolveScopeEntries,
 } from '../scripts/build-knowledge-graph.mjs';
 import {
@@ -180,6 +181,16 @@ test('resolveScopeEntries expands globs, prefixes and planned files', () => {
     ]);
     assert.equal(result.scopeResolution.concreteCount, 4);
     assert.equal(result.scopeResolution.plannedCount, 1);
+});
+
+test('graph file existence ignores developer-local transient files', () => {
+    const repositoryFiles = new Set([
+        'scripts/build-knowledge-graph.mjs',
+        'src/core/main.js',
+    ]);
+
+    assert.equal(resolveGraphFileExists('src/core/main.js', repositoryFiles), true);
+    assert.equal(resolveGraphFileExists('tmp/workspace-cleanup-report.json', repositoryFiles), false);
 });
 
 test('parseBotTrainingDependencyTable extracts BT rows with mixed V and BT dependencies', () => {

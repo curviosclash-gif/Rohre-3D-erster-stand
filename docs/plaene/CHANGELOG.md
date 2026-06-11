@@ -1205,3 +1205,12 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `npm audit`/`npm --prefix electron audit`/`npm --prefix server audit` vorher/nachher, `npm run build` inkl. `architecture:guard` -> PASS, Dev-Server-Smoke `npm run dev` -> HTTP 200.
 - Residual-risk: Electron-Reste bleiben dokumentierte Ausnahme; Vite-6-Dev-Warmup zeigte einmalig mehrminuetigen CPU-Spin nach dem ersten Request, danach stabil.
 - Not-checked: `build:app`/Electron-Renderer-Drift, Playwright-Smokes, Vollsuite; `vite.config.js` unveraendert.
+
+## Repo-Fix 2026-06-11 (Mobile-Input, Tilt-Lifecycle und Graph-Determinismus)
+
+- Root-Cause Mobile-Item: `TouchInputSource` lieferte den Runtime-Index `0`, bevor `PlayerInputSystem` den Boolean-Inputvertrag in einen Inventarindex uebersetzt. Der Touch-Pfad liefert wieder `true`/`false`; ein Integrationstest sichert `true -> 0` und `false -> -1`.
+- Root-Cause Tilt: Legacy-Orientation `-90` wurde gegen den kalibrierten kanonischen Winkel `270` verglichen. `resolveScreenOrientationAngle` normalisiert nun Screen- und Legacy-Werte vor dem Lifecycle-Vergleich.
+- Root-Cause Graph: Datei-Knoten nutzten den lokalen Dateisystemzustand fuer `exists`. Der Graph verwendet jetzt seinen Repo-Dateiindex, sodass ignorierte Berichte wie `tmp/workspace-cleanup-report.json` committed Artefakte nicht mehr veraendern.
+- Evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> PASS 25/25; `node --test tests/mobile-arcade-app.contract.test.mjs` -> PASS 7/7; `node --test tests/knowledge-graph-build.contract.test.mjs` -> PASS 32/32; `npm run graph:check` -> PASS nach Rebuild.
+- Residual-risk: Kein physisches Android-Geraet wurde verwendet; echte Sensor- und Touch-Hardware bleibt ausserhalb dieses Slices.
+- Not-checked: keine Playwright-/Vollsuite und keine Aenderung an Android-Manifest, Masterplan oder V116-Plan.

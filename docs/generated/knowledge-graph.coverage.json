@@ -186,19 +186,19 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2157,
-    "rawCoveredFileCount": 1397,
+    "trackedFileCount": 2156,
+    "rawCoveredFileCount": 1398,
     "rawCoveragePercent": 64.8,
-    "adjustedTrackedFileCount": 1462,
-    "adjustedCoveredFileCount": 1157,
-    "adjustedCoveragePercent": 79.1,
-    "uncoveredFileCount": 760,
+    "adjustedTrackedFileCount": 1463,
+    "adjustedCoveredFileCount": 1158,
+    "adjustedCoveragePercent": 79.2,
+    "uncoveredFileCount": 758,
     "uncoveredActiveFileCount": 305,
     "classifications": [
       {
         "classification": "agent-workflow",
         "excludedFromCoverage": true,
-        "count": 21,
+        "count": 19,
         "coveredCount": 11
       },
       {
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 346,
-        "coveredCount": 194
+        "count": 347,
+        "coveredCount": 195
       },
       {
         "classification": "prototype",
@@ -773,32 +773,6 @@
     },
     {
       "path": ".agents/workflows/release.md",
-      "tracked": true,
-      "coveredInCore": false,
-      "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
-      "surfaces": [],
-      "classification": "agent-workflow",
-      "excludedFromCoverage": true,
-      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
-    },
-    {
-      "path": ".agents/workflows/repo-fix.md",
-      "tracked": true,
-      "coveredInCore": false,
-      "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
-      "surfaces": [],
-      "classification": "agent-workflow",
-      "excludedFromCoverage": true,
-      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
-    },
-    {
-      "path": ".agents/workflows/repro-analyse.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
@@ -15297,6 +15271,23 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Mobile_God_File_Sunset_V140.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/neu/Feature_Plan_Autopilot_Isolierter_Ein_Slice_Pilot_V147.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
