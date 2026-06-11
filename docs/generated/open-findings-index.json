@@ -2,7 +2,7 @@
   "schema_version": "open-findings-index.v1",
   "generated_by": "scripts/build-open-findings-index.mjs",
   "authority": "generated-signals-only",
-  "as_of": "2026-06-10",
+  "as_of": "2026-06-11",
   "canonical_sources": {
     "findings": "docs/prozess/Open_Findings.md",
     "manual_decisions": "docs/prozess/finding-decisions.json",
@@ -72,17 +72,15 @@
       "reason": "V90 accepted the remaining major-version-bound dependency findings until the scheduled security review.",
       "file_references": [
         "electron/package-lock.json",
-        "electron/package.json",
-        "package-lock.json",
-        "package.json"
+        "electron/package.json"
       ],
       "descriptions": [
-        "npm audit --audit-level=low --json` meldet 2 moderate Root-Reste fuer `vite`/`esbuild`; `npm --prefix electron audit --audit-level=low --json` meldet 12 Major-gebundene `electron`-/`electron-builder`-/`tar`-/`@tootallnate/once`-Reste. Die non-force Kandidaten `fast-uri`, `ip-address` und der lockfile-kompatible `@tootallnate/once`-Pfad sind in V90 erledigt. V90 akzeptiert den Rest als dokumentierte Security-Ausnahme mit Wiedervorlage 2026-06-17 oder frueher bei neuer non-force Fix-Verfuegbarkeit; Build-/Architektur-/Doku-Gates sind seit 2026-05-18 gruen"
+        "Wiedervorlage 2026-06-11 ausgefuehrt: Root ist nach non-force-Fixes plus `vite@6.4.2` (90.3.1 Option A) gruen, Server nach `ws@8.20.1` gruen. Offen bleiben 10 Major-gebundene Electron-Reste (`electron@33.4.11` -> `electron@42.4.0`, `electron-builder@25.1.8` -> `electron-builder@26.15.2`; Runtime-Anteil Electron-Shell-Advisories, Build-time-Anteil `tar`-Kette der Packaging-Toolchain, Details im V90-Snapshot 2026-06-11). Kein non-force-Kandidat offen; dokumentierte Security-Ausnahme mit Wiedervorlage 2026-07-11 oder frueher bei non-force Fix-Verfuegbarkeit bzw. eingeplantem Electron-Major-Slice"
       ],
       "signals": {
         "owner_block_status": "done",
         "owner_block_phase": "90.99",
-        "referenced_file_count": 4,
+        "referenced_file_count": 2,
         "missing_file_count": 0
       },
       "drift": [],

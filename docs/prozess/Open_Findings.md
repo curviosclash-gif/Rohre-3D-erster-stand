@@ -1,6 +1,6 @@
 ﻿# Open Findings (Kanonische Nebenablage)
 
-Stand: 2026-05-20.
+Stand: 2026-06-11.
 Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Audit-Follow-ups ausserhalb des kompakten Master-Index.
 
 ## Zuordnung nach Zielblock
@@ -17,7 +17,7 @@ Diese Datei ist die kanonische Ablage fuer offene Findings, Review-Reste und Aud
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()`; nachhaltige Behebung ueber Ownership-/Port-Zuschnitt in `V104` | mittel |
-| P21 | `package.json`, `package-lock.json`, `electron/package.json`, `electron/package-lock.json` | `npm audit --audit-level=low --json` meldet 2 moderate Root-Reste fuer `vite`/`esbuild`; `npm --prefix electron audit --audit-level=low --json` meldet 12 Major-gebundene `electron`-/`electron-builder`-/`tar`-/`@tootallnate/once`-Reste. Die non-force Kandidaten `fast-uri`, `ip-address` und der lockfile-kompatible `@tootallnate/once`-Pfad sind in V90 erledigt. V90 akzeptiert den Rest als dokumentierte Security-Ausnahme mit Wiedervorlage 2026-06-17 oder frueher bei neuer non-force Fix-Verfuegbarkeit; Build-/Architektur-/Doku-Gates sind seit 2026-05-18 gruen | hoch |
+| P21 | `electron/package.json`, `electron/package-lock.json` | Wiedervorlage 2026-06-11 ausgefuehrt: Root ist nach non-force-Fixes plus `vite@6.4.2` (90.3.1 Option A) gruen, Server nach `ws@8.20.1` gruen. Offen bleiben 10 Major-gebundene Electron-Reste (`electron@33.4.11` -> `electron@42.4.0`, `electron-builder@25.1.8` -> `electron-builder@26.15.2`; Runtime-Anteil Electron-Shell-Advisories, Build-time-Anteil `tar`-Kette der Packaging-Toolchain, Details im V90-Snapshot 2026-06-11). Kein non-force-Kandidat offen; dokumentierte Security-Ausnahme mit Wiedervorlage 2026-07-11 oder frueher bei non-force Fix-Verfuegbarkeit bzw. eingeplantem Electron-Major-Slice | hoch |
 | P45 | `tests/audio.contract.test.mjs` | Test-Isolation fuer `MockAudioContext` in `afterEach` nicht konsistent (`global.AudioContext` reset fehlt) | niedrig |
 | P45 | `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `vite.config.js` | Hohe Komplexitaet in Hotspots erhoeht Regressionsrisiko | mittel |
 | P46 | `eslint.config.js`, `tsconfig.architecture.json` | Tooling-Gates decken nur engen Laufzeitpfad ab | mittel |
