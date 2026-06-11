@@ -147,3 +147,20 @@ test('validateAgentContext rejects provider pins and incomplete shell coverage',
   assert(ids.includes('claude-settings-provider-pinned'));
   assert(ids.includes('claude-settings-shell-coverage'));
 });
+
+test('validateAgentContext rejects asymmetric Bash and PowerShell permissions', async () => {
+  const root = await createFixture();
+  await writeFixture(root, '.claude/settings.json', JSON.stringify({
+    permissions: {
+      allow: [
+        'PowerShell(git status *)',
+        'PowerShell(npm run plan:check)',
+        'Bash(git status *)',
+      ],
+    },
+  }, null, 2));
+
+  const result = await validateAgentContext({ root });
+
+  assert(result.violations.some((violation) => violation.id === 'claude-settings-shell-parity'));
+});

@@ -160,14 +160,37 @@ function validateClaudeSettings(text, violations) {
   }
 
   const allowRules = settings.permissions?.allow || [];
-  const hasBashRules = allowRules.some((rule) => /^Bash\(/.test(rule));
-  const hasPowerShellRules = allowRules.some((rule) => /^PowerShell\(/.test(rule));
+  // Desktop and terminal expose different shell tool names, but project permissions must stay equivalent.
+  const shellCommands = {
+    Bash: new Set(),
+    PowerShell: new Set(),
+  };
+  for (const rule of allowRules) {
+    const match = /^(Bash|PowerShell)\((.*)\)$/.exec(rule);
+    if (match) {
+      shellCommands[match[1]].add(match[2]);
+    }
+  }
+  const hasBashRules = shellCommands.Bash.size > 0;
+  const hasPowerShellRules = shellCommands.PowerShell.size > 0;
   if (!hasBashRules || !hasPowerShellRules) {
     addViolation(
       violations,
       REQUIRED_FILES.claudeSettings,
       'claude-settings-shell-coverage',
       'Projektweite Claude-Permissions muessen Terminal-Bash und Claude-Desktop-PowerShell abdecken.'
+    );
+    return;
+  }
+
+  const missingPowerShell = [...shellCommands.Bash].filter((command) => !shellCommands.PowerShell.has(command));
+  const missingBash = [...shellCommands.PowerShell].filter((command) => !shellCommands.Bash.has(command));
+  if (missingPowerShell.length > 0 || missingBash.length > 0) {
+    addViolation(
+      violations,
+      REQUIRED_FILES.claudeSettings,
+      'claude-settings-shell-parity',
+      'Projektweite Claude-Permissions muessen dieselben Kommandos fuer Terminal-Bash und Claude-Desktop-PowerShell erlauben.'
     );
   }
 }
