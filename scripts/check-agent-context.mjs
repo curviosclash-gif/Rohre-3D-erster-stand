@@ -159,17 +159,15 @@ function validateClaudeSettings(text, violations) {
     );
   }
 
-  const permissionRules = [
-    ...(settings.permissions?.allow || []),
-    ...(settings.permissions?.ask || []),
-    ...(settings.permissions?.deny || []),
-  ];
-  if (permissionRules.some((rule) => /^PowerShell\(/.test(rule))) {
+  const allowRules = settings.permissions?.allow || [];
+  const hasBashRules = allowRules.some((rule) => /^Bash\(/.test(rule));
+  const hasPowerShellRules = allowRules.some((rule) => /^PowerShell\(/.test(rule));
+  if (!hasBashRules || !hasPowerShellRules) {
     addViolation(
       violations,
       REQUIRED_FILES.claudeSettings,
-      'claude-settings-shell-mismatch',
-      'Projektweite Claude-Permissions muessen den verfuegbaren Bash-Toolnamen verwenden.'
+      'claude-settings-shell-coverage',
+      'Projektweite Claude-Permissions muessen Terminal-Bash und Claude-Desktop-PowerShell abdecken.'
     );
   }
 }

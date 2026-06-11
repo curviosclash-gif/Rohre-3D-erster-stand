@@ -1172,9 +1172,9 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 ## Governance-Fix 2026-06-10 (Claude-Code-Repo-Setup)
 
-- `CLAUDE.md` importiert `AGENTS.md` jetzt automatisch und bleibt ein reiner Tool-Adapter ohne eigene Governance. Die gemeinsame `.claude/settings.json` ist providerneutral, Git-Bash-kompatibel und als einzige Datei aus `.claude/` versioniert; lokale Settings, Plaene, Launch-Dateien und Worktrees bleiben ignoriert.
+- `CLAUDE.md` importiert `AGENTS.md` jetzt automatisch und bleibt ein reiner Tool-Adapter ohne eigene Governance. Die gemeinsame `.claude/settings.json` ist providerneutral, deckt Claude Desktop mit PowerShell sowie die Terminal-CLI mit Git Bash ab und ist als einzige Datei aus `.claude/` versioniert; lokale Settings, Plaene, Launch-Dateien und Worktrees bleiben ignoriert.
 - `check:agent-context` prueft den Import, valide providerneutrale Projektsettings und Shell-Permissions. Das Gate laeuft jetzt in `docs:check` und `gates:pre-commit`, damit Adapterdrift nicht erneut an den Abschlusschecks vorbeikommt.
 - Lokale Account-, CLI- und Worktree-Bereinigung wurde getrennt vom Repo-Commit ausgefuehrt, damit persoenliche Zugangsdaten und Recovery-Artefakte nicht in die Projekt-Governance gelangen.
-- Evidence: `npm run test:agent-context` und `npm run docs:check` -> PASS; isoliert nach `npm run graph:build` auch `npm run gates:pre-commit` -> PASS.
+- Evidence: `npm run test:agent-context` und `npm run docs:check` -> PASS; isoliert nach `npm run graph:build` auch `npm run gates:pre-commit` -> PASS. Claude Desktop erzeugte danach erfolgreiche First-Party-Antworten mit Version `2.1.170`, Request-IDs und Tokenverbrauch ohne neue Vertex-/Quota-/401-Fehler.
 - Residual-risk: persoenliche Claude-Account-, Modell- und App-Einstellungen bleiben bewusst ausserhalb der Repo-Governance.
 - Not-checked: keine Produktcodepfade und keine Vollsuite.

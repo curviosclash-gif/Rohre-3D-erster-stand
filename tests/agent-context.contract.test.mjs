@@ -36,7 +36,12 @@ async function createFixture() {
   await writeFixture(root, '.claude/settings.json', JSON.stringify({
     permissions: {
       defaultMode: 'acceptEdits',
-      allow: ['Bash(git status *)', 'Bash(npm run plan:check)'],
+      allow: [
+        'PowerShell(git status *)',
+        'PowerShell(npm run plan:check)',
+        'Bash(git status *)',
+        'Bash(npm run plan:check)',
+      ],
     },
   }, null, 2));
   await writeFixture(root, '.gemini/README.md', [
@@ -124,7 +129,7 @@ test('validateAgentContext requires Claude to import AGENTS.md', async () => {
   assert(result.violations.some((violation) => violation.id === 'claude-agents-import'));
 });
 
-test('validateAgentContext rejects provider pins and PowerShell-only project permissions', async () => {
+test('validateAgentContext rejects provider pins and incomplete shell coverage', async () => {
   const root = await createFixture();
   await writeFixture(root, '.claude/settings.json', JSON.stringify({
     model: 'claude-opus-4-7',
@@ -140,5 +145,5 @@ test('validateAgentContext rejects provider pins and PowerShell-only project per
   const ids = result.violations.map((violation) => violation.id);
 
   assert(ids.includes('claude-settings-provider-pinned'));
-  assert(ids.includes('claude-settings-shell-mismatch'));
+  assert(ids.includes('claude-settings-shell-coverage'));
 });
