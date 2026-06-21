@@ -97,6 +97,8 @@ export function deriveTiltSteeringState({
     const betaDelta = normalizeTiltDelta(beta, neutralBeta);
     const gammaDelta = normalizeTiltDelta(gamma, neutralGamma);
     const angle = normalizeOrientationAngle(orientationAngle);
+    // Mapping deckt alle vier Winkel ab: Android Classic ist per Manifest auf
+    // sensorLandscape (90/270) gelockt, der Browser-Pfad bleibt orientation-frei (0/180 inklusive).
     let yawDeg = gammaDelta;
     let pitchDeg = betaDelta;
 

@@ -526,6 +526,27 @@ test('Mobile Classic tilt steering maps calibrated device orientation', () => {
     orientationAngle: 90,
   });
   assert.equal(landscapeRight.yawRight, true);
+
+  // V131 Orientation-Policy: Android lockt auf sensorLandscape, beide Landscape-
+  // Richtungen (90/270) muessen dieselbe physische Neigung spiegelbildlich mappen.
+  const reverseLandscapeLeft = deriveTiltSteeringState({
+    ...neutral,
+    beta: 40,
+    gamma: -2,
+    orientationAngle: 270,
+  });
+  assert.equal(reverseLandscapeLeft.yawLeft, true);
+  assert.equal(reverseLandscapeLeft.yawRight, false);
+  assert.equal(reverseLandscapeLeft.yawAxis, -landscapeRight.yawAxis);
+
+  const reverseLandscapeRight = deriveTiltSteeringState({
+    ...neutral,
+    beta: 8,
+    gamma: -2,
+    orientationAngle: 270,
+  });
+  assert.equal(reverseLandscapeRight.yawRight, true);
+  assert.equal(reverseLandscapeRight.yawLeft, false);
 });
 
 test('Mobile Classic tilt steering uses soft analog axes for phone control', () => {
@@ -1050,6 +1071,7 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   const buildScript = await readText('scripts/build-mobile-classic-app.mjs');
   const capacitorScript = await readText('scripts/capacitor-mobile-classic.mjs');
   const gradleFile = await readText('android-classic/app/build.gradle');
+  const androidManifest = await readText('android-classic/app/src/main/AndroidManifest.xml');
   const mainActivity = await readText('android-classic/app/src/main/java/de/curviosclash/classic/MainActivity.java');
   const updateScript = await readText('scripts/update-mobile-classic-from-github.mjs');
   const mobileClassicApp = await readText('src/mobile-classic/MobileClassicApp.js');
@@ -1099,6 +1121,9 @@ test('Unified Mobile Android scripts build, wrap, and validate the phone app pat
   assert.doesNotMatch(gradleFile, /mobileAndroidIsArcade|de\.curviosclash\.arcade/);
   assert.match(gradleFile, /versionCode mobileClassicVersionCode/);
   assert.match(gradleFile, /versionName mobileClassicVersionName/);
+  // V131 Orientation-Policy: landscape-stabil fuer Match und Menue, keine Activity-Recreation bei Rotation.
+  assert.match(androidManifest, /android:screenOrientation="sensorLandscape"/);
+  assert.match(androidManifest, /android:configChanges="[^"]*orientation[^"]*"/);
   assert.match(mainActivity, /WindowManager\.LayoutParams\.FLAG_KEEP_SCREEN_ON/);
   assert.match(mainActivity, /OnBackPressedCallback/);
   assert.match(mainActivity, /__curviosAndroidBackHandler/);

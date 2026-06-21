@@ -9,8 +9,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- V131 Orientation-Policy: Match und Menue bleiben landscape-stabil (beide Richtungen);
+             Tilt-Neutral/Steuerlayout gehen auf Android von 90/270 Grad aus, Browser bleibt orientation-frei. -->
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:screenOrientation="sensorLandscape"
             android:name="de.curviosclash.classic.MainActivity"
             android:label="${appName}"
             android:theme="@style/AppTheme.NoActionBarLaunch"
