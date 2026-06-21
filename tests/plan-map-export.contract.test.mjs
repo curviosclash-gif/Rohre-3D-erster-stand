@@ -52,7 +52,7 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
     && edge.phase === 'V120.99'
   ));
   assert.ok(v121OpenDependency, 'V121 -> V120.99 dependency is present');
-  assert.equal(v121OpenDependency.fulfilled, false);
+  assert.equal(v121OpenDependency.fulfilled, true);
 
   assert.ok(data.graph.nodeCount > 0);
   assert.ok(data.scorecard.metrics.criticalPathTotalCount >= 4);
@@ -78,23 +78,30 @@ test('plan map export builds a read-only implementation-plan dataset', async () 
   assert.equal(data.summary.archiveReferenceCount, data.archiveReferences.length);
   assert.ok(data.summary.byArchiveType['superseded-intake'] > 0);
   assert.ok(data.summary.byArchiveType['archived-block'] > 0);
-  const mobileIntake = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md');
-  assert.ok(mobileIntake);
-  assert.equal(mobileIntake.workstream, 'android-mobile');
-  assert.equal(mobileIntake.classification, 'intake-review');
-  assert.equal(mobileIntake.intakeLane, 'candidate');
-  assert.equal(mobileIntake.intakeAction, 'review-for-master-intake');
-  assert.equal(mobileIntake.primaryBlockId, 'V131');
-  assert.equal(mobileIntake.canonicalBlockId, null);
-  assert.equal(mobileIntake.requiresUserIntake, true);
-  assert.equal(mobileIntake.targetPlanFile, 'docs/plaene/aktiv/V131.md');
+  const candidateIntake = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Mobile_God_File_Sunset_V140.md');
+  assert.ok(candidateIntake);
+  assert.equal(candidateIntake.workstream, 'android-mobile');
+  assert.equal(candidateIntake.classification, 'intake-review');
+  assert.equal(candidateIntake.intakeLane, 'candidate');
+  assert.equal(candidateIntake.intakeAction, 'review-for-master-intake');
+  assert.equal(candidateIntake.primaryBlockId, 'V140');
+  assert.equal(candidateIntake.canonicalBlockId, null);
+  assert.equal(candidateIntake.requiresUserIntake, true);
+  assert.equal(candidateIntake.targetPlanFile, 'docs/plaene/aktiv/V140.md');
 
-  const adoptedOpen = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Graph_RAG_Viewer_Evidence_Dashboard_V121.md');
+  const adoptedOpen = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md');
   assert.ok(adoptedOpen);
   assert.equal(adoptedOpen.intakeLane, 'adopted-open');
   assert.equal(adoptedOpen.intakeAction, 'open-canonical-block');
-  assert.equal(adoptedOpen.canonicalBlockId, 'V121');
+  assert.equal(adoptedOpen.canonicalBlockId, 'V122');
   assert.equal(adoptedOpen.requiresUserIntake, false);
+
+  const adoptedDone = data.intakePlans.find((plan) => plan.path === 'docs/plaene/neu/Feature_Mobile_Classic_Steuerung_Hardening_V131.md');
+  assert.ok(adoptedDone);
+  assert.equal(adoptedDone.intakeLane, 'adopted-done');
+  assert.equal(adoptedDone.intakeAction, 'archive-candidate-after-gate');
+  assert.equal(adoptedDone.canonicalBlockId, 'V131');
+  assert.equal(adoptedDone.requiresUserIntake, false);
 
   const archivedIntake = data.archiveReferences.find((reference) => (
     reference.path === 'docs/plaene/alt/superseded-intakes-2026-05/Feature_Legacy_Runtime_Surface_Sunset_V91.md'

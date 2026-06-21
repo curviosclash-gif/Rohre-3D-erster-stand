@@ -455,3 +455,22 @@ test('commit wrapper detects commitlint line-length violations before commit', (
   assert.equal(violations.length, 1);
   assert.match(violations[0].text, /^Residual-risk:/);
 });
+
+test('commit wrapper allows long machine path trailers', () => {
+  const longPath = 'docs/Fehlerberichte/2026-06-11_v148-commit-blocked-by-parallel-plan-state.md';
+  const message = buildCommitMessage({
+    message: 'fix: enforce commit metadata',
+    workflow: 'code',
+    decision: 'D3',
+    evidence: 'npm run plan:check -> PASS',
+    stagedFiles: ['scripts/agent-preflight.mjs'],
+    knownUncommitted: [longPath],
+    residualRisk: 'none',
+    notChecked: 'full suite',
+    gate: 'User approved governance scope',
+  });
+
+  const violations = findOverlongCommitLines(message);
+  assert.equal(violations.length, 0);
+  assert.match(message, new RegExp(`^Known-uncommitted: ${longPath}$`, 'm'));
+});

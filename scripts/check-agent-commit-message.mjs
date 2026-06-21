@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 
+import { findOverlongCommitLines } from './agent-commit-wrapper.mjs';
 import { validateAgentEnvelope } from './agent-preflight.mjs';
 
 function stripComments(text) {
@@ -68,6 +69,11 @@ export async function validateAgentCommitMessage({
     uncommittedFiles,
     claimText: text,
   });
+  const lineLengthViolations = findOverlongCommitLines(text).map((entry) => ({
+    id: 'commit-line-too-long',
+    message: `Commit-Nachricht verletzt body-max-line-length=100 in Zeile ${entry.line}.`,
+    files: [],
+  }));
 
   return {
     skipped: false,
@@ -83,6 +89,7 @@ export async function validateAgentCommitMessage({
     generatedBy,
     canonicalSource,
     ...result,
+    violations: [...result.violations, ...lineLengthViolations],
   };
 }
 

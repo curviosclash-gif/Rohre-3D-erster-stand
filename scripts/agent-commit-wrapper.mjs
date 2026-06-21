@@ -104,7 +104,8 @@ export function findOverlongCommitLines(messageText, maxLength = 100) {
   return messageText
     .split(/\r?\n/)
     .map((line, index) => ({ line: index + 1, length: line.length, text: line }))
-    .filter((entry) => entry.length > maxLength);
+    .filter((entry) => entry.length > maxLength)
+    .filter((entry) => !/^(?:Scope|Known-uncommitted):\s+\S+/.test(entry.text));
 }
 
 function printValidationResult(result) {

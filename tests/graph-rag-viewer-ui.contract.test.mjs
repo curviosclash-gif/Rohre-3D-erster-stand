@@ -41,6 +41,37 @@ function serveWorkspace() {
     });
 }
 
+function closeServer(server) {
+    return new Promise((resolve, reject) => {
+        server.close((error) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            resolve();
+        });
+    });
+}
+
+async function withViewerPage(callback) {
+    const browser = await chromium.launch({ headless: true });
+    let server = null;
+    try {
+        const served = await serveWorkspace();
+        server = served.server;
+        const page = await browser.newPage();
+        await callback(page, served.url);
+    } finally {
+        try {
+            await browser.close();
+        } finally {
+            if (server) {
+                await closeServer(server);
+            }
+        }
+    }
+}
+
 async function setViewerJson(page, name, data) {
     await page.locator('#fileInput').setInputFiles({
         name,
@@ -53,75 +84,65 @@ async function expectError(page, message) {
     await page.waitForFunction((expected) => document.querySelector('#errorBanner')?.textContent.includes(expected), message);
 }
 
-test('viewer UI smoke renders fixture, safety, fallback and Ask Repo evidence', async (t) => {
-    const { server, url } = await serveWorkspace();
-    const browser = await chromium.launch({ headless: true });
-    t.after(async () => {
-        await browser.close();
-        await new Promise((resolve) => server.close(resolve));
+test('viewer UI smoke renders fixture, safety, fallback and Ask Repo evidence', async () => {
+    await withViewerPage(async (page, url) => {
+        await page.goto(url);
+        await page.getByRole('button', { name: 'Fixture laden', exact: true }).click();
+        await page.waitForSelector('#dashboard:not([hidden])');
+
+        assert.match(await page.locator('#statusStrip').textContent(), /READ-ONLY/);
+        assert.match(await page.locator('#statusStrip').textContent(), /LLM FALLBACK/);
+
+        await page.getByRole('button', { name: 'Critical Paths', exact: true }).click();
+        assert.match(await page.locator('#criticalPathsView').textContent(), /spawn/);
+
+        await page.getByRole('button', { name: 'Evidence', exact: true }).click();
+        assert.ok(await page.locator('#evidenceView .evidence-card').count() > 0);
+
+        await page.getByRole('button', { name: 'Safety', exact: true }).click();
+        assert.match(await page.locator('#safetyView').textContent(), /Raw included\s*no/);
+
+        await page.getByRole('button', { name: 'Ask Repo', exact: true }).click();
+        await page.getByRole('button', { name: 'Chat-Fixture laden', exact: true }).click();
+        await page.waitForSelector('#askRepoView .chat-response');
+        assert.match(await page.locator('#askRepoView').textContent(), /Explain this answer/);
+        assert.match(await page.locator('#askRepoView').textContent(), /fallback-rulebased/);
     });
-    const page = await browser.newPage();
-    await page.goto(url);
-    await page.getByRole('button', { name: 'Fixture laden', exact: true }).click();
-    await page.waitForSelector('#dashboard:not([hidden])');
-
-    assert.match(await page.locator('#statusStrip').textContent(), /READ-ONLY/);
-    assert.match(await page.locator('#statusStrip').textContent(), /LLM FALLBACK/);
-
-    await page.getByRole('button', { name: 'Critical Paths', exact: true }).click();
-    assert.match(await page.locator('#criticalPathsView').textContent(), /spawn/);
-
-    await page.getByRole('button', { name: 'Evidence', exact: true }).click();
-    assert.ok(await page.locator('#evidenceView .evidence-card').count() > 0);
-
-    await page.getByRole('button', { name: 'Safety', exact: true }).click();
-    assert.match(await page.locator('#safetyView').textContent(), /Raw included\s*no/);
-
-    await page.getByRole('button', { name: 'Ask Repo', exact: true }).click();
-    await page.getByRole('button', { name: 'Chat-Fixture laden', exact: true }).click();
-    await page.waitForSelector('#askRepoView .chat-response');
-    assert.match(await page.locator('#askRepoView').textContent(), /Explain this answer/);
-    assert.match(await page.locator('#askRepoView').textContent(), /fallback-rulebased/);
 });
 
-test('viewer UI rejects unsafe inputs and marks historical-only evidence', async (t) => {
-    const { server, url } = await serveWorkspace();
-    const browser = await chromium.launch({ headless: true });
-    t.after(async () => {
-        await browser.close();
-        await new Promise((resolve) => server.close(resolve));
-    });
+test('viewer UI rejects unsafe inputs and marks historical-only evidence', async () => {
     const fixture = JSON.parse(await fs.readFile(FIXTURE_PATH, 'utf8'));
-    const page = await browser.newPage();
-    await page.goto(url);
+    await withViewerPage(async (page, url) => {
+        await page.goto(url);
 
-    await setViewerJson(page, 'invalid-contract.json', { ...fixture, contract: 'invalid.viewer.contract' });
-    await expectError(page, 'Nicht unterstuetzter Contract');
+        await setViewerJson(page, 'invalid-contract.json', { ...fixture, contract: 'invalid.viewer.contract' });
+        await expectError(page, 'Nicht unterstuetzter Contract');
 
-    await setViewerJson(page, 'missing-evidence.json', { ...fixture, evidence: undefined });
-    await expectError(page, 'Feld "evidence" fehlt');
+        await setViewerJson(page, 'missing-evidence.json', { ...fixture, evidence: undefined });
+        await expectError(page, 'Feld "evidence" fehlt');
 
-    await setViewerJson(page, 'unsafe-raw.json', {
-        ...fixture,
-        safety: { ...fixture.safety, mode: 'unsafe-raw', rawIncluded: true },
+        await setViewerJson(page, 'unsafe-raw.json', {
+            ...fixture,
+            safety: { ...fixture.safety, mode: 'unsafe-raw', rawIncluded: true },
+        });
+        await expectError(page, 'Viewer akzeptiert nur default-redacted Exporte');
+
+        const historicalFixture = {
+            ...fixture,
+            evidence: {
+                ...fixture.evidence,
+                claims: fixture.evidence.claims.map((claim) => ({ ...claim, historical: true })),
+            },
+            safety: { ...fixture.safety, historicalVisible: true },
+        };
+        await setViewerJson(page, 'historical-only.json', historicalFixture);
+        await page.getByRole('button', { name: 'Evidence', exact: true }).click();
+        assert.equal(
+            await page.locator('#evidenceView .evidence-card.is-historical').count(),
+            historicalFixture.evidence.claims.length,
+        );
+        assert.match(await page.locator('#statusStrip').textContent(), /HISTORICAL SOURCES/);
     });
-    await expectError(page, 'Viewer akzeptiert nur default-redacted Exporte');
-
-    const historicalFixture = {
-        ...fixture,
-        evidence: {
-            ...fixture.evidence,
-            claims: fixture.evidence.claims.map((claim) => ({ ...claim, historical: true })),
-        },
-        safety: { ...fixture.safety, historicalVisible: true },
-    };
-    await setViewerJson(page, 'historical-only.json', historicalFixture);
-    await page.getByRole('button', { name: 'Evidence', exact: true }).click();
-    assert.equal(
-        await page.locator('#evidenceView .evidence-card.is-historical').count(),
-        historicalFixture.evidence.claims.length,
-    );
-    assert.match(await page.locator('#statusStrip').textContent(), /HISTORICAL SOURCES/);
 });
 
 test('viewer and chat surfaces keep write actions outside the static UI', async () => {
