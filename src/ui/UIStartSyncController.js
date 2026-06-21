@@ -180,51 +180,8 @@ export class UIStartSyncController {
         const settings = this._getSettings();
         if (!settings) return;
         this.manager._disposeDisposerList(this._startSetupDisposers);
-        const startSetup = ensureStartSetupLocalState(settings);
         const getSettings = () => this._getSettings();
         const listen = (target, type, handler) => this.manager._listen(target, type, handler, undefined, this._startSetupDisposers);
-
-        const mapSearchInput = this.ui.mapSearchInput;
-        const mapFilterSelect = this.ui.mapFilterSelect;
-        const vehicleSearchInput = this.ui.vehicleSearchInput;
-        const vehicleFilterSelect = this.ui.vehicleFilterSelect;
-
-        if (mapSearchInput) {
-            mapSearchInput.value = startSetup.mapSearch;
-            listen(mapSearchInput, 'input', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                ensureStartSetupLocalState(currentSettings).mapSearch = String(mapSearchInput.value || '');
-                this.syncStartSetupState(currentSettings);
-            });
-        }
-        if (mapFilterSelect) {
-            mapFilterSelect.value = startSetup.mapFilter;
-            listen(mapFilterSelect, 'change', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                ensureStartSetupLocalState(currentSettings).mapFilter = String(mapFilterSelect.value || 'all');
-                this.syncStartSetupState(currentSettings);
-            });
-        }
-        if (vehicleSearchInput) {
-            vehicleSearchInput.value = startSetup.vehicleSearch;
-            listen(vehicleSearchInput, 'input', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                ensureStartSetupLocalState(currentSettings).vehicleSearch = String(vehicleSearchInput.value || '');
-                this.syncStartSetupState(currentSettings);
-            });
-        }
-        if (vehicleFilterSelect) {
-            vehicleFilterSelect.value = startSetup.vehicleFilter;
-            listen(vehicleFilterSelect, 'change', () => {
-                const currentSettings = getSettings();
-                if (!currentSettings) return;
-                ensureStartSetupLocalState(currentSettings).vehicleFilter = String(vehicleFilterSelect.value || 'all');
-                this.syncStartSetupState(currentSettings);
-            });
-        }
 
         bindStartSetupControls(this, listen, getSettings);
     }

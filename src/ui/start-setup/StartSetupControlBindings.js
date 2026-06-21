@@ -1,6 +1,28 @@
 import { HANGAR_SELECTION_PLAYER_SLOTS, writeHangarMapSelection, writeHangarVehicleSelection } from '../hangar/HangarSelectionWritebackContract.js';
 import { ensureStartSetupLocalState, pushRecentEntry, toggleFavoriteEntry } from './StartSetupUiOps.js';
 
+function bindStartSetupInput(controller, listen, getSettings, input, eventType, stateKey, fallbackValue) {
+    if (!input) return;
+    const settings = getSettings();
+    if (!settings) return;
+    const startSetup = ensureStartSetupLocalState(settings);
+    input.value = startSetup[stateKey];
+    listen(input, eventType, () => {
+        const currentSettings = getSettings();
+        if (!currentSettings) return;
+        ensureStartSetupLocalState(currentSettings)[stateKey] = String(input.value || fallbackValue);
+        controller.syncStartSetupState(currentSettings);
+    });
+}
+
+function bindSearchAndFilterControls(controller, listen, getSettings) {
+    const { ui } = controller;
+    bindStartSetupInput(controller, listen, getSettings, ui.mapSearchInput, 'input', 'mapSearch', '');
+    bindStartSetupInput(controller, listen, getSettings, ui.mapFilterSelect, 'change', 'mapFilter', 'all');
+    bindStartSetupInput(controller, listen, getSettings, ui.vehicleSearchInput, 'input', 'vehicleSearch', '');
+    bindStartSetupInput(controller, listen, getSettings, ui.vehicleFilterSelect, 'change', 'vehicleFilter', 'all');
+}
+
 function bindMapAndVehicleRecents(controller, listen, getSettings) {
     const { ui } = controller;
     if (ui.mapSelect) {
@@ -82,6 +104,7 @@ function bindQuickPickList(listNode, attributeName, selectNode, listen) {
 }
 
 export function bindStartSetupControls(controller, listen, getSettings) {
+    bindSearchAndFilterControls(controller, listen, getSettings);
     bindMapAndVehicleRecents(controller, listen, getSettings);
     bindFavoriteToggles(controller, listen, getSettings);
     const { ui } = controller;
