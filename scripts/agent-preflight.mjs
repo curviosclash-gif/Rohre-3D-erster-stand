@@ -5,6 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 
 import { auditStagedDiff } from './check-ai-diff-audit.mjs';
+import { parseWorkflowFrontmatter } from './check-workflow-contracts.mjs';
 
 const DECISION_ORDER = new Map([
   ['D0', 0],
@@ -16,8 +17,7 @@ const DECISION_ORDER = new Map([
 
 const D3_SURFACE_PATTERNS = [
   /^AGENTS\.md$/,
-  /^\.agents\/rules\//,
-  /^\.agents\/workflows\//,
+  /^\.agents(?:\/|$)/,
   /^\.husky\/(?:pre-commit|commit-msg)$/,
   /^docs\/Umsetzungsplan\.md$/,
   /^docs\/plaene\/aktiv\//,
@@ -63,12 +63,26 @@ function runGit(args, { root = process.cwd() } = {}) {
 }
 
 export async function listWorkflows({ root = process.cwd() } = {}) {
+  return (await readWorkflowMetadata({ root })).map((workflow) => workflow.name);
+}
+
+export async function readWorkflowMetadata({ root = process.cwd() } = {}) {
   const workflowDir = path.join(root, '.agents', 'workflows');
   const entries = await fs.readdir(workflowDir, { withFileTypes: true });
-  return entries
+  const workflows = await Promise.all(entries
     .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
-    .map((entry) => entry.name.slice(0, -'.md'.length))
-    .sort((a, b) => a.localeCompare(b));
+    .map(async (entry) => {
+      const name = entry.name.slice(0, -'.md'.length);
+      const file = `.agents/workflows/${entry.name}`;
+      const content = await fs.readFile(path.join(workflowDir, entry.name), 'utf8');
+      return {
+        name,
+        file,
+        frontmatter: parseWorkflowFrontmatter(content),
+      };
+    }));
+  return workflows
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function parseStagedNameStatus(stdout) {
@@ -161,6 +175,16 @@ function decisionAtLeast(decision, minimum) {
   return DECISION_ORDER.has(decision)
     && DECISION_ORDER.has(minimum)
     && DECISION_ORDER.get(decision) >= DECISION_ORDER.get(minimum);
+}
+
+function normalizeEvidenceText(value) {
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function evidenceIncludesCheck(evidence, check) {
+  const normalizedCheck = normalizeEvidenceText(check);
+  return normalizedCheck.length > 0
+    && normalizeEvidenceText(evidence).includes(normalizedCheck);
 }
 
 function listDifference(left, right) {
@@ -275,7 +299,9 @@ export async function validateAgentEnvelope({
   graph = true,
   claimText = '',
 } = {}) {
-  const workflows = await listWorkflows({ root });
+  const workflowMetadata = await readWorkflowMetadata({ root });
+  const workflows = workflowMetadata.map((entry) => entry.name);
+  const selectedWorkflow = workflowMetadata.find((entry) => entry.name === workflow);
   const stagedChanges = changes || getStagedChanges({ root });
   const stagedDiff = diff ?? (changes ? '' : getStagedDiff({ root }));
   const actualUncommittedFiles = uncommittedFiles || getUncommittedFiles({ root });
@@ -297,6 +323,33 @@ export async function validateAgentEnvelope({
     addViolation(violations, 'missing-decision', 'Commit/Preflight braucht `Decision: D0|D1|D2|D3|D4`.');
   } else if (!DECISION_ORDER.has(decision)) {
     addViolation(violations, 'unknown-decision', `Unbekannte Decision-Klasse \`${decision}\`.`);
+  }
+
+  if (selectedWorkflow?.frontmatter) {
+    const workflowFloor = selectedWorkflow.frontmatter.decision_floor;
+    if (DECISION_ORDER.has(decision) && DECISION_ORDER.has(workflowFloor) && !decisionAtLeast(decision, workflowFloor)) {
+      addViolation(
+        violations,
+        'workflow-decision-below-floor',
+        `Workflow \`${workflow}\` verlangt mindestens \`Decision: ${workflowFloor}\`.`,
+        [selectedWorkflow.file]
+      );
+    }
+
+    const requiredChecks = Array.isArray(selectedWorkflow.frontmatter.required_checks)
+      ? selectedWorkflow.frontmatter.required_checks.filter(Boolean)
+      : [];
+    if (isPresent(evidence) && !/^none$/i.test(evidence.trim())) {
+      const missingRequiredChecks = requiredChecks.filter((check) => !evidenceIncludesCheck(evidence, check));
+      if (missingRequiredChecks.length > 0) {
+        addViolation(
+          violations,
+          'workflow-required-check-missing',
+          `Evidence fehlt deklarierte Workflow-Checks: ${missingRequiredChecks.join(', ')}.`,
+          [selectedWorkflow.file]
+        );
+      }
+    }
   }
 
   if (!evidence || /^none$/i.test(evidence.trim())) {

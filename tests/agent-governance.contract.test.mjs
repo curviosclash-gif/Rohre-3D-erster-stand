@@ -19,9 +19,39 @@ import { validateAgentCommitMessage } from '../scripts/check-agent-commit-messag
 async function createFixture() {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), 'curvios-agent-governance-'));
   await fs.mkdir(path.join(root, '.agents', 'workflows'), { recursive: true });
-  await fs.writeFile(path.join(root, '.agents', 'workflows', 'code.md'), '---\ndescription: Test\n---\n', 'utf8');
-  await fs.writeFile(path.join(root, '.agents', 'workflows', 'quick.md'), '---\ndescription: Test\n---\n', 'utf8');
+  await fs.writeFile(path.join(root, '.agents', 'workflows', 'code.md'), workflowFixture(), 'utf8');
+  await fs.writeFile(
+    path.join(root, '.agents', 'workflows', 'quick.md'),
+    workflowFixture({ decisionFloor: 'D0', mutates: 'optional' }),
+    'utf8'
+  );
+  await fs.writeFile(path.join(root, '.agents', 'workflows', 'repo-fix.md'), workflowFixture(), 'utf8');
   return root;
+}
+
+function workflowFixture({
+  description = 'Test',
+  decisionFloor = 'D2',
+  mutates = 'required',
+  requiredChecks = ['npm run plan:check'],
+} = {}) {
+  const requiredCheckLines = requiredChecks.length === 0
+    ? ['required_checks: []']
+    : ['required_checks:', ...requiredChecks.map((check) => `  - ${check}`)];
+  return [
+    '---',
+    `description: ${description}`,
+    `decision_floor: ${decisionFloor}`,
+    `mutates: ${mutates}`,
+    'user_gate: conditional',
+    'commit_strategy: scoped',
+    ...requiredCheckLines,
+    'outputs:',
+    '  - repo-change',
+    '  - chat',
+    '---',
+    '',
+  ].join('\n');
 }
 
 async function writeGraphFixture(root, graph) {
@@ -74,6 +104,76 @@ test('agent envelope blocks governance surfaces below D3', async () => {
 
   assert.equal(result.violations.length, 1);
   assert.equal(result.violations[0].id, 'd3-surface-underrated');
+});
+
+test('agent envelope rejects workflow decisions below frontmatter floor', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'repo-fix',
+    decision: 'D0',
+    evidence: 'npm run plan:check -> PASS',
+    scope: 'src/core/main.js',
+    knownUncommitted: 'none',
+    notChecked: 'full suite',
+    changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
+  });
+
+  assert.deepEqual(result.violations.map((violation) => violation.id), ['workflow-decision-below-floor']);
+});
+
+test('agent envelope rejects workflow evidence missing a required check', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'repo-fix',
+    decision: 'D2',
+    evidence: 'node --test tests/agent-governance.contract.test.mjs -> PASS',
+    scope: 'src/core/main.js',
+    knownUncommitted: 'none',
+    notChecked: 'full suite',
+    changes: [{ status: 'M', file: 'src/core/main.js' }],
+    uncommittedFiles: ['src/core/main.js'],
+  });
+
+  assert.deepEqual(result.violations.map((violation) => violation.id), ['workflow-required-check-missing']);
+});
+
+test('agent envelope treats all .agents files as D3 governance surface', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'repo-fix',
+    decision: 'D2',
+    evidence: 'npm run plan:check -> PASS',
+    scope: '.agents/test_mapping.md',
+    knownUncommitted: 'none',
+    notChecked: 'full suite',
+    changes: [{ status: 'M', file: '.agents/test_mapping.md' }],
+    uncommittedFiles: ['.agents/test_mapping.md'],
+  });
+
+  assert.deepEqual(result.violations.map((violation) => violation.id), ['d3-surface-underrated']);
+});
+
+test('agent envelope accepts D3 .agents change with gate residual risk and not checked', async () => {
+  const root = await createFixture();
+  const result = await validateAgentEnvelope({
+    root,
+    workflow: 'repo-fix',
+    decision: 'D3',
+    evidence: 'npm run plan:check -> PASS',
+    gate: 'User approved .agents governance update',
+    scope: '.agents/test_mapping.md',
+    knownUncommitted: 'none',
+    residualRisk: 'none',
+    notChecked: 'full suite',
+    changes: [{ status: 'M', file: '.agents/test_mapping.md' }],
+    uncommittedFiles: ['.agents/test_mapping.md'],
+  });
+
+  assert.deepEqual(result.violations, []);
 });
 
 test('D3 requires an explicit user approval instead of a generic gate note', async () => {
