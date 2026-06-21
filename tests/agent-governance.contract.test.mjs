@@ -4,7 +4,11 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { isExplicitUserGate, validateAgentEnvelope } from '../scripts/agent-preflight.mjs';
+import {
+  isExplicitUserGate,
+  parseShortStatusPath,
+  validateAgentEnvelope,
+} from '../scripts/agent-preflight.mjs';
 import {
   buildCommitMessage,
   deriveCommitScope,
@@ -436,6 +440,20 @@ test('commit wrapper derives and renders exact staged and remaining scopes', () 
   assert.match(message, /^Scope: scripts\/agent-preflight\.mjs$/m);
   assert.match(message, /^Scope: tests\/new\.contract\.test\.mjs$/m);
   assert.match(message, /^Known-uncommitted: docs\/user-note\.md$/m);
+});
+
+test('commit wrapper treats staged-only renames as staged scope', () => {
+  const renamedTarget = parseShortStatusPath(
+    'R  docs/plaene/neu/Old_Intake.md -> docs/plaene/alt/Old_Intake.md'
+  );
+  const { stagedFiles, knownUncommitted } = deriveCommitScope({
+    changes: [{ status: 'R100', file: 'docs/plaene/alt/Old_Intake.md' }],
+    uncommittedFiles: [renamedTarget],
+  });
+
+  assert.equal(renamedTarget, 'docs/plaene/alt/Old_Intake.md');
+  assert.deepEqual(stagedFiles, ['docs/plaene/alt/Old_Intake.md']);
+  assert.deepEqual(knownUncommitted, []);
 });
 
 test('commit wrapper detects commitlint line-length violations before commit', () => {

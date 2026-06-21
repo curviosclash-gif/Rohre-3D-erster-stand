@@ -92,12 +92,24 @@ export function getStagedDiff({ root = process.cwd() } = {}) {
   return runGit(['diff', '--cached', '--no-ext-diff', '--unified=0'], { root });
 }
 
+export function parseShortStatusPath(line) {
+  const rawLine = line.trimEnd();
+  if (!rawLine) {
+    return '';
+  }
+  const rawPath = rawLine.slice(3).trim();
+  if (!rawPath) {
+    return '';
+  }
+  const normalizedPath = normalizePath(rawPath);
+  const renameTarget = normalizedPath.split(' -> ').pop().trim();
+  return renameTarget;
+}
+
 export function getUncommittedFiles({ root = process.cwd() } = {}) {
   return runGit(['status', '--short'], { root })
     .split(/\r?\n/)
-    .map((line) => line.trimEnd())
-    .filter(Boolean)
-    .map((line) => normalizePath(line.slice(3).trim()))
+    .map(parseShortStatusPath)
     .filter(Boolean)
     .sort((a, b) => a.localeCompare(b));
 }
