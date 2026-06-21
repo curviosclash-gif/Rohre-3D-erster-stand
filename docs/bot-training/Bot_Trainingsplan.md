@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-05-08
+Stand: 2026-06-11 (BT96 Torch-Security-Bump aufgenommen; Trainingsleiter unveraendert, Stand der PPO-Lanes weiterhin 2026-05-08)
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -3711,6 +3711,56 @@ Rollout-Intake-Pflichtpaket:
 | Feature-Flag/Strategieflag fehlt | hoch | Architektur/Ops | `BOT_STRATEGY=dqn|ppo` oder gleichwertigen Schalter als separaten Rollout-Scope verlangen | Umschaltung wuerde Code-Aenderung statt kontrollierter Konfiguration brauchen |
 | Kandidat funktioniert nur im Trainingsharness | hoch | Integration/RL | Export-/Load-Proof, Freeze-Lineage und PPO-Validate-Real-Load vor Intake verlangen | Trainingsmodell ist vorhanden, aber Runtime-nahe Loader koennen es nicht reproduzierbar laden |
 | Handoff verschweigt alte Gate-Blocker | hoch | Governance | Reward-Ordering, MaxStep-Plateau, Holdout-Lineage, DQN-Anker und Statistikvertrag im Handoff wiederholen | BT95 fasst nur positive Metriken zusammen und verliert die roten Voraussetzungen |
+
+---
+
+## Block BT96: Torch-Security-Bump der PPO-Dependency-Lane
+
+Quelle: `docs/plaene/alt/BT96_Torch_Security_Bump_Intake_2026-06-11.md`
+
+<!-- LOCK: frei -->
+
+Scope:
+
+- `python/requirements-ppo.txt` auf eine torch-Version ohne offene GHSAs heben (Zielbild `>= 2.12.1`) oder eine begruendete Zwischenstufe mit dokumentierter Rest-Ausnahme waehlen.
+- Keine Trainings-/Reward-/Curriculum-Aenderungen (BT93/BT95-Scope) und keine npm-Manifeste (V146 im Umsetzungsplan).
+- Anlass: die einzigen nach der V90/P21-Wiedervorlage 2026-06-11 offenen Dependabot-Alerts sind 12 `torch`-Findings (2x6, je 2 medium + 4 low) auf `python/requirements.txt` und `python/requirements-ppo.txt`; torch laeuft nur in der lokalen Trainings-Toolchain (kein Spieler-/Runtime-Pfad, deshalb P2).
+- Befundlage: GHSA-vgrw-7cvw-pwgx (medium, `< 2.9.1`), GHSA-f4hp-rmr7-r7v8 (medium, `<= 2.6.0`), GHSA-rrmf-rvhw-rf47 (low, `<= 2.12.0`), GHSA-qfhq-4f3w-5fph (low, `< 2.10.0`), GHSA-x3gm-94wq-g975 (low, `<= 2.6.0`), GHSA-c678-jfcj-6jmf (low, `<= 2.6.0`).
+- Stale-Anteil: `python/requirements.txt` enthaelt aktuell kein `torch` (nur `pytest`, `websockets`); die 6 Alerts darauf referenzieren einen alten Manifeststand und sollten beim naechsten Dependabot-Rescan zufallen.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 `python/requirements-ppo.txt` pinnt eine torch-Version gemaess 96.1-Entscheidung; Install-, Test- und Smoke-Gates sind gruen.
+- [ ] DoD.2 Dependabot meldet 0 offene python-Alerts oder die Reste sind mit GHSA, Begruendung und Wiedervorlage dokumentiert.
+- [ ] DoD.3 Die SB3-/gymnasium-/numpy-Kopplung ist als Matrix dokumentiert, inklusive Rollback-Pfad (Datei-Revert plus venv-Neuaufbau).
+
+### 96.1 Kompatibilitaetsmatrix
+
+- [ ] 96.1.1 Zielversionen klaeren: kleinste torch-Version, die alle 6 GHSAs schliesst, gegen `stable-baselines3`-Kompatibilitaet (2.3.2 vs. aktuelle SB3-Releases), `gymnasium`-, `numpy`- und Python-Version-Annahmen der BT93-Harness.
+- [ ] 96.1.2 Entscheidung dokumentieren: voller Sprung (`torch >= 2.12.1` + SB3-Bump) vs. Zwischenstufe (`2.9.1`/`2.10`) mit dokumentierter Rest-Ausnahme und Wiedervorlage.
+
+### 96.2 Bump und Verifikation
+
+- [ ] 96.2.1 `python/requirements-ppo.txt` gemaess 96.1.2 heben (eigener Commit; Rollback = Datei-Revert plus venv-Neuaufbau).
+- [ ] 96.2.2 Gates: frisches venv-Install + `pip check`, `python -m pytest python/tests`, kleinster PPO-Smoke-Lauf (Kurzlauf-Config der BT93-Harness); bei Rot Blocker dokumentieren und reverten statt patchen.
+
+### 96.3 Alert-Abgleich
+
+- [ ] 96.3.1 Nach Push pruefen, ob die 6 Alerts auf `python/requirements-ppo.txt` zufallen (`gh api .../dependabot/alerts`).
+- [ ] 96.3.2 Stale Alerts auf `python/requirements.txt` pruefen; falls sie nicht automatisch zufallen, Dismiss mit Begruendung "Manifest enthaelt kein torch" (User-owned).
+
+### 96.99 Abschluss-Gate
+
+- [ ] 96.99.1 Dependabot meldet 0 offene python-Alerts oder die Reste sind mit GHSA, Begruendung und Wiedervorlage dokumentiert.
+- [ ] 96.99.2 Notiz im Bot-Trainingsplan (Dependency-Lane-Stand) und Querverweis im V90-Umfeld, damit die Security-Historie konsistent bleibt.
+
+### Risiko-Register BT96
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| torch 2.3 -> 2.12 ueberspringt viele Releases; SB3-/gymnasium-Kopplung kann Trainings-APIs brechen | mittel | RL/Tooling | Matrix in 96.1, Smoke-Gate in 96.2, Rollback per Datei-Revert | Install-, Test- oder Smoke-Gate wird rot |
+| Groessere torch-Wheels verlaengern Install-/CI-Zeiten der Trainings-Lane | niedrig | Ops | Zielversion ohne CUDA-Extras pinnen, Install nur in der PPO-Lane | venv-Setup wird im Alltag spuerbar langsamer |
+| Zwischenstufe statt Vollsprung laesst low-GHSAs offen | niedrig | Governance | dokumentierte Ausnahme mit Wiedervorlage als Pflicht in 96.1.2 | Entscheidung faellt gegen `>= 2.12.1` |
 
 ---
 

@@ -3,7 +3,7 @@
   "updated": "2026-06-11",
   "start_anchor": {
     "block": "V131",
-    "phase": "131.4",
+    "phase": "131.99",
     "source": "docs/Umsetzungsplan.md"
   },
   "next_recommended_start": {
@@ -890,7 +890,7 @@
     {
       "id": "V131",
       "title": "Mobile Classic Steuerung Hardening",
-      "status": "active",
+      "status": "done",
       "priority": "P2",
       "owner": "frei",
       "workstream": "android-mobile",
@@ -899,13 +899,13 @@
         "V126.99",
         "V72.99"
       ],
-      "current_phase": "131.4",
+      "current_phase": "131.99",
       "plan_file": "docs/plaene/aktiv/V131.md",
       "lock": {
-        "status": "active",
+        "status": "closed",
         "agent": "-",
         "start_date": "2026-06-10",
-        "target": "131.1-131.3 abgeschlossen (useItem-Protokoll, Pause-/Back-Drift-Abschluss, Tilt-Kalibrierungszustand); 131.4 offen",
+        "target": "Abgeschlossen 2026-06-11; Orientation-Policy `sensorLandscape` (Match/Menue landscape-stabil), 90/270-Tilt-Mapping-Contracts gruen; Device-Rotations-Smoke bleibt manuelles Gate",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     },
@@ -990,6 +990,69 @@
         "agent": "-",
         "start_date": "-",
         "target": "Geplant",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V146",
+      "title": "Electron-Major-Security-Slice (electron 42, electron-builder 26)",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "repo-governance",
+      "depends_on": [
+        "V90.99"
+      ],
+      "current_phase": "146.1",
+      "plan_file": "docs/plaene/aktiv/V146.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant; Ziel-Termin P21-Wiedervorlage 2026-07-11",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V147",
+      "title": "Plan-Autopilot isolierter Ein-Slice-Pilot",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "ai-graph-tools",
+      "depends_on": [
+        "V117.99"
+      ],
+      "current_phase": "147.0",
+      "plan_file": "docs/plaene/aktiv/V147.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant; Umsetzung erst nach Produktfokus-/Nutzungs-Gate und expliziter D3-Freigabe fuer den isolierten Pilot",
+        "source": "docs/Umsetzungsplan.md#lock-status"
+      }
+    },
+    {
+      "id": "V148",
+      "title": "Test- und Fehlererkennungs-Automatisierung",
+      "status": "planned",
+      "priority": "P2",
+      "owner": "frei",
+      "workstream": "repo-governance",
+      "depends_on": [
+        "V125.99",
+        "V138.99",
+        "V141.99",
+        "V142.99"
+      ],
+      "current_phase": "148.1",
+      "plan_file": "docs/plaene/aktiv/V148.md",
+      "lock": {
+        "status": "frei",
+        "agent": "-",
+        "start_date": "-",
+        "target": "Geplant; Start nach V142, V146 nur Soft-Handoff fuer Electron-/Windows-Signale",
         "source": "docs/Umsetzungsplan.md#lock-status"
       }
     }

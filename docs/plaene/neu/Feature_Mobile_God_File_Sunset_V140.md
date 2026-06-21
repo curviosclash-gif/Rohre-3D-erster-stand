@@ -4,6 +4,8 @@ status: draft
 priority: P2
 owner: user-intake
 planned_block_id: V140
+updated_at: 2026-06-04
+analysis_source: Dreiwochenanalyse 2026-05-13 bis 2026-06-03
 depends_on:
   - V132.99
   - V135.99
@@ -17,6 +19,7 @@ scope_files:
   - src/ui/touch/TouchTiltSteeringOps.js
   - src/ui/touch/TouchTiltSensorLifecycle.js
   - src/ui/touch/TouchControlLayoutOps.js
+  - tests/touch-tilt-steering-ops.contract.test.mjs
   - tests/mobile-classic-app.contract.test.mjs
   - tests/mobile-arcade-app.contract.test.mjs
   - scripts/architecture/LegacyMaxLinesConfig.mjs
@@ -58,6 +61,25 @@ Historisches Wachstum nach dem Ceiling-Abgleich vom 2026-05-27:
 - `src/mobile-classic/MobileClassicApp.js`: Mobile-Settings-/Menue-Slices mit `+5` und `+94/-1`.
 
 Der Refactor behandelt deshalb nicht nur Zeilenanzahl. Er schneidet die Verantwortlichkeiten so, dass kommende Mobile-Arbeit sichere Zielmodule hat.
+
+## Ergaenzende Analyse-Evidence 2026-06-04
+
+Die Dreiwochenanalyse fuer den Zeitraum 2026-05-13 bis 2026-06-03 bestaetigt V140 als noetigen Sanierungsscope, aber nicht als Sammelblock fuer alle gefundenen Drift-Signale.
+
+Evidence:
+
+- `npm run lint:architecture -> FAIL`: bekannte `max-lines`-Blocker in `src/mobile-classic/MobileClassicApp.js` und `src/ui/TouchInputSource.js`; zusaetzlich bleiben `innerHTML`-Warnungen sichtbar.
+- `npm run check:architecture:metrics -> PASS`: Architekturmetriken bleiben grundsaetzlich gruen, listen aber `MobileClassicApp.js` und `TouchInputSource.js` weiterhin unter den groessten gescannten Dateien.
+- `npm run check:architecture:ratchet -> PASS`: bestehende Ratchet-Baseline ist intakt; der Fix soll deshalb Ceilings senken oder entfernen, nicht die Guard-Politik aufweichen.
+- `npm run graph:check -> PASS`: Graph-Konsistenz ist gruen; Scope-Historie verweist fuer die Hotspots auf Mobile-/UI-Folgearbeit.
+- `node scripts/query-knowledge-graph.mjs untested-systems -> WARN`: mehrere Repo-/Map-/Agent-Viewer-Runtimes bleiben ungetestet; das ist ein separater Tooling-Smoke-Follow-up, nicht V140.
+- `npm run docs:check -> FAIL`: Freshness-Drift ist ein separater Governance-/Doku-Scope und wird durch `docs/plaene/neu/Feature_Finding_Plan_Doku_Drift_Automatisierung_V141.md` adressiert.
+
+Konsequenz:
+
+- V140 fokussiert nur Mobile-App-Shell, Touch-Input und zugehoerige Architektur-Ceilings.
+- Doku-/Finding-/Freshness-Drift bleibt V141.
+- Viewer-/Repo-Tool-Smokes brauchen einen eigenen Tooling-Follow-up oder eine passende Erweiterung eines bestehenden AI-/Graph-/Tooling-Blocks.
 
 ## Governance-Handoff 2026-06-01
 
@@ -104,6 +126,25 @@ Graph-/Scope-Signal:
 - `node scripts/query-knowledge-graph.mjs impact-for-file src/mobile-classic/MobileClassicApp.js --json`: Klassifikation `mobile-wrapper`, Scope-Historie `V132`, `V135`.
 - `node scripts/query-knowledge-graph.mjs impact-for-file src/ui/TouchInputSource.js --json`: Klassifikation `product-code`, Scope-Historie `V105`, `V132`, `V72`, `V91`.
 - `node scripts/query-knowledge-graph.mjs scope-collisions --json`: keine aktive Dateikollision fuer die beiden Hotspots; historischer Mobile-Scope bleibt bei V132/V135 nachvollziehbar.
+
+## Produktpfad und Prioritaet
+
+Primaerer Produktpfad:
+
+- Desktop-App bleibt Referenz fuer Produktverhalten.
+- Mobile/Android ist hier ein produktiver Wrapper-/Input-Pfad, aber kein Anlass fuer Desktop-Verhaltensaenderungen.
+- Browser-Demo-Paritaet ist kein Ziel dieses Blocks.
+
+Empfohlene operative Reihenfolge:
+
+1. Baseline read-only wiederholen und Scope einfrieren.
+2. Niedrigrisiko-App-Shell-Schnitt vorziehen, falls das Ziel zuerst Gate-Recovery ist: Styles und Update-UI aus `MobileClassicApp.js`.
+3. Touch-Tilt-Pure-Ops schneiden, bevor V131 weitere funktionale Steuerungsarbeit auf `TouchInputSource.js` legt.
+4. Sensor-Lifecycle und Layout/DOM-Ops getrennt schneiden.
+5. Erst nach verifizierten Extraktionen die Legacy-Ceilings senken oder entfernen.
+6. Android-Device-Smoke nur als manuelles Gate, nicht als automatischer Pflichtlauf.
+
+Der kleinste sinnvolle Umsetzungsschritt ist 140.1 plus ein einzelner Extraktionsslice. Kein Slice soll beide Hotspots gleichzeitig produktiv veraendern.
 
 ## Responsibility-Growth-Matrix
 
@@ -164,6 +205,16 @@ Ratchet-Auswirkung:
 | Ceiling erhoehen | D3 | separate USER-GATE-Ausnahme mit Rueckbaukriterium |
 | Master-/Aktivplan-Intake | D3 | USER-GATE |
 
+Scope-Klassifikation fuer die Umsetzung:
+
+| Surface | Klasse | Regel |
+| --- | --- | --- |
+| `src/mobile-classic/**` neue kleine UI-/Shell-Module | edit required | Nur ein Shell-Slice pro Aenderung; keine Desktop-Semantik. |
+| `src/ui/TouchInputSource.js` und `src/ui/touch/**` | edit required | Pure-Ops vor Lifecycle/DOM; keine funktionale Steuerungsaenderung ohne eigenen V131-Bezug. |
+| `scripts/architecture/LegacyMaxLinesConfig.mjs` | edit required, D3-gated | Nur Absenkung/Entfernung nach verifiziertem Slice. |
+| `docs/Umsetzungsplan.md`, `docs/plaene/aktiv/V140.md` | optional, D3-gated | Nur durch User-Intake, nicht durch diesen Draft. |
+| Doku-Freshness, Findings, Viewer-Smokes | no-op in V140 | Separat ueber V141 oder eigenen Tooling-Scope. |
+
 ## Phasen
 
 ### 140.1 Baseline und Scope-Freeze
@@ -172,10 +223,11 @@ status: draft
 goal: Verantwortlichkeiten, Konsumenten und kleinstes Regression-Signal vor dem Refactor festhalten.
 output: Bestaetigte Matrix und Slice-Reihenfolge.
 
-- [ ] 140.1.1 ESLint-Zaehlerstand, physische Zeilenzahl, Exporte und produktive Konsumenten fuer beide Debt-Surfaces erfassen.
-- [ ] 140.1.2 Mobile-Contracts und vorhandene Tilt-/Touch-Testsignale inventarisieren; Testluecken fuer Pure-Ops-Extraktionen benennen.
-- [ ] 140.1.3 Reihenfolge gegen V131 festziehen: zuerst verhaltensneutrale Ops-Extraktion oder explizite Zielmodul-Nutzung im funktionalen Nachbarblock.
-- [ ] 140.1.4 Architecture Capsule und D2/D4-Slice-Grenze pro Extraktion dokumentieren.
+- [ ] 140.1.1 `git status --short`, `npm run lint:architecture`, `npm run check:architecture:metrics`, `npm run check:architecture:ratchet`, `npm run graph:check` und `npm run plan:check` als Baseline erfassen; keine Vollsuite.
+- [ ] 140.1.2 ESLint-Zaehlerstand, physische Zeilenzahl, Exporte und produktive Konsumenten fuer beide Debt-Surfaces erfassen.
+- [ ] 140.1.3 Mobile-Contracts und vorhandene Tilt-/Touch-Testsignale inventarisieren; Testluecken fuer Pure-Ops-Extraktionen benennen.
+- [ ] 140.1.4 Reihenfolge gegen V131 festziehen: zuerst verhaltensneutrale Ops-Extraktion oder explizite Zielmodul-Nutzung im funktionalen Nachbarblock.
+- [ ] 140.1.5 Architecture Capsule und D2/D4-Slice-Grenze pro Extraktion dokumentieren.
 
 ### 140.2 Touch-Tilt-Ops extrahieren
 
@@ -218,6 +270,7 @@ output: Gesenkte Ceilings, dokumentierte Restschuld und V131-Handoff.
 - [ ] 140.5.1 `LegacyMaxLinesConfig.mjs` nur auf verifizierte niedrigere Staende anpassen; keine Ceiling-Erhoehung.
 - [ ] 140.5.2 Restverantwortungen und maximal zwei weitere Folge-Slices dokumentieren, falls eine Entry-Datei noch ueber 500 Zeilen liegt.
 - [ ] 140.5.3 V131-Handoff aktualisieren: Press-/Hold-, Pause-/Back- und Orientation-Arbeit nutzt die neuen Zielmodule statt die Debt-Surfaces auszubauen.
+- [ ] 140.5.4 V141- und Tooling-Smoke-Abgrenzung im Abschluss benennen, damit V140 nicht als Fix fuer Doku- oder Viewer-Drift missverstanden wird.
 
 ### 140.99 Abschluss-Gate
 
@@ -252,15 +305,22 @@ Kleinste sinnvolle Gates pro Slice:
 Abschluss-Gates:
 
 - `npm run architecture:guard`
+- `npm run check:architecture:metrics`
+- `npm run check:architecture:ratchet`
+- `npm run graph:check`
+- `npm run plan:check`
 - `npm run docs:sync`
 - `npm run docs:check`
 
 Not-checked im Draft:
 
 - Kein Runtime-Code geaendert.
-- Keine Tests ausgefuehrt.
+- Keine Tests fuer diesen Draft ausgefuehrt.
+- Keine Vollsuite geplant oder ausgefuehrt.
 - Kein Device-Smoke ausgefuehrt.
 - Kein Hook-/ESLint-Skript-Umbau geplant.
+- Keine Doku-Freshness-, Finding- oder Viewer-Smoke-Umsetzung in V140 geplant.
+- Keine Master-/Aktivplan-Uebernahme durch den Draft.
 
 ## Intake-Hinweis
 
@@ -272,3 +332,4 @@ Manuelle Uebernahme erforderlich:
 - Hard dependencies: `V132.99`, `V135.99`
 - Koordination: V131 funktional getrennt halten und vor breiten Touch-Slices auf neue Zielmodule routen
 - Empfohlene Prioritaet: P2 Architektur-Follow-up vor groesserer weiterer Mobile-Erweiterung
+- Nicht Teil des Intake: V141-Doku-/Finding-Drift und separate Viewer-/Repo-Tool-Smokes

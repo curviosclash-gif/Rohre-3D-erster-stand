@@ -6,6 +6,16 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Plan-Intake 2026-06-11 (V148 Test- und Fehlererkennungs-Automatisierung)
+
+- Nach User-Auftrag wurde V148 direkt als kanonischer aktiver Block in Master und `docs/plaene/aktiv/V148.md` aufgenommen; ein zusaetzlicher Intake-Draft wurde bewusst nicht angelegt.
+- Der Block plant eine gestufte Erkennung statt Vollsuite pro Commit: deterministische Diff-zu-Test-Auswahl mit Graph-Signal und Safety-Fallback, Linux-/Windows-Fast-Lane, getrennte Nightly-Jobs, Coverage-/Fault-Seeding-/Property-Piloten sowie einen pruefbaren Fehlerbericht-Lebenszyklus.
+- Hard dependencies sind V125.99, V138.99, V141.99 und V142.99; V146.99 bleibt ein Soft-Handoff fuer aktuelle Electron-/Windows-Smoke-Signale.
+- Scope-Grenze: keine produktiven Runtime-/Gameplay-Aenderungen, keine automatische Anlage oder Schliessung von Fehlerberichten, keine globale Coverage-Prozentvorgabe und keine Vollsuite im normalen Commit-Pfad.
+- Plan-Evidence: vorhandene Testschichten und CI wurden aus `.agents/test_mapping.md`, `package.json` und `.github/workflows/ci.yml` inventarisiert; `test-prioritization` ist als vorhandenes Graph-Signal belegt, braucht aber bei leerer Kandidatenliste einen konservativen Fallback. `npm run plan:index:check`, `npm run plan:context:check`, `npm run check:plan-evidence-claims` und `npm run graph:check` -> PASS; nach Abschluss des parallelen V131-Evidence-Scope laeuft `npm run gates:pre-commit` am 2026-06-21 wieder PASS.
+- Blockerbericht: `docs/Fehlerberichte/2026-06-11_v148-commit-blocked-by-parallel-plan-state.md` ist resolved; V131 wurde bewusst nicht in den V148-Scope aufgenommen.
+- Not-checked: keine V148-Implementierung, keine neue CI-/Nightly-Ausfuehrung, keine Coverage-Messung, kein Fuzz-Lauf und keine Migration historischer Fehlerberichte.
+
 ## Archivierungsabgleich 2026-06-11 (V76, V140, V141)
 
 - Nach User-Gate (Intake-Entwurf `docs/plaene/neu/Handlungsempfehlungen_Meta_Quote_Reduktion.md`, Punkt 3.3) wurden `V76`, `V140` und `V141` aus den Master-Tabellen (Aktive Bloecke, Abhaengigkeiten, Lock-Status, Arbeitsstrom-Index) entfernt; die Sektion "Abgeschlossene Bloecke (offener Abgleich vor Archivierung)" ist damit leer und wurde aufgeloest.
@@ -1205,6 +1215,15 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Evidence: `npm audit`/`npm --prefix electron audit`/`npm --prefix server audit` vorher/nachher, `npm run build` inkl. `architecture:guard` -> PASS, Dev-Server-Smoke `npm run dev` -> HTTP 200.
 - Residual-risk: Electron-Reste bleiben dokumentierte Ausnahme; Vite-6-Dev-Warmup zeigte einmalig mehrminuetigen CPU-Spin nach dem ersten Request, danach stabil.
 - Not-checked: `build:app`/Electron-Renderer-Drift, Playwright-Smokes, Vollsuite; `vite.config.js` unveraendert.
+
+## V131-Abschluss 2026-06-11 (Mobile Classic Steuerung Hardening)
+
+- 131.4 Orientation-Policy nach User-Freigabe (REVIEW-Gate der AI-Ausfuehrungsmatrix): Android Classic laeuft jetzt fest in Landscape, beide Richtungen (`android:screenOrientation="sensorLandscape"` als einzige native Aenderung in der `AndroidManifest.xml`); Match und Menue koennen nicht mehr durch Rotation im Kampf verschoben werden. Browser-Pfad bleibt orientation-frei, dort schuetzt weiter die 131.3-Re-Kalibrierung bei Orientation-Wechsel.
+- Tilt-Mapping-Contracts decken beide Landscape-Richtungen ab: 90/270 mappen dieselbe physische Neigung spiegelbildlich (`yawAxis`-Symmetrie), Manifest-Assertions sichern `screenOrientation` und `configChanges` gegen stilles Zuruedrehen.
+- Wirkung des Blocks gesamt: useItem-Edge-Protokoll statt Frame-Wiederholung (131.1), Pause-Button plus Android-Back-Pfad mit Overlay-Schutz (131.2), gefuehrte Tilt-Kalibrierung mit Zustandsmodell (131.3), bewusste Orientation-Policy (131.4).
+- Evidence: `node --test tests/mobile-classic-app.contract.test.mjs` -> pass 25/25; `npm run app:classic:android:assets:check` -> assets fresh (36 files); `npm run plan:check`, `npm run graph:check` und `npm run gates:pre-commit` -> PASS (mit nicht-blockierendem V146-WARN).
+- Residual-risk: 180-Grad-Landscape-Flip mid-match loest eine kurze Re-Kalibrierung aus (bewusst, selten); `sensorLandscape` ignoriert die System-Rotationssperre (gewollt fuer Tilt-Spiel).
+- Not-checked: kein Device-Install-Smoke (kein Geraet verfuegbar) - Rotations-/Tilt-Verhalten auf echtem Geraet bleibt manuelles Gate `app:classic:android:install`; keine Vollsuite, kein Playwright.
 
 ## Repo-Fix 2026-06-11 (Mobile-Input, Tilt-Lifecycle und Graph-Determinismus)
 

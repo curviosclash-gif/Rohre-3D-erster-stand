@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-06-11. Aktiver Lock: `-`; Startanker: `V131 131.4 aktiv`; `V145` ist archiviert; offene Intake-Bloecke `V118`, `V127`, `V131`, `V136` und `V142`-`V144` sind geplant; naechster Start gemaess Priorisierungsabgleich: kleiner `V131`-Funktionsslice, `V118`-Architektur-Proof oder V142-Graph-Drift-Folgearbeit.
+Stand: 2026-06-11. Aktiver Lock: `-`; Startanker: `V131 131.99 abgeschlossen`; `V145` ist archiviert; offene Intake-Bloecke `V118`, `V127`, `V136`, `V142`-`V144` und `V146`-`V148` sind geplant; naechster Start gemaess Priorisierungsabgleich: `V118`-Architektur-Proof oder V142-Graph-Drift-Folgearbeit; `V146` ist an die P21-Wiedervorlage 2026-07-11 terminiert; `V147` bleibt hinter Produktfokus-/Nutzungs-Gate; `V148` folgt auf V142.
 Status-Fliesstext und Abschluss-Historie liegen in `docs/plaene/CHANGELOG.md`.
 Offene Findings und Audit-Reste liegen kanonisch in `docs/prozess/Open_Findings.md`.
 
@@ -32,8 +32,8 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | Map Content, Map Tools & Settings | `V103`, `V106`, `V114`, `V130` | Map-/GLB-Content, SettingsManager, SurfacePolicy und kuratierte Parcours-Map-Varianz. |
 | Android / Mobile | `V131`, `V132`, `V135` | Mobile-Classic-Steuerung, Android Arcade-Parcours, Mobile-Menue-UX und God-File-Sunset fuer produktive Mobile-/Android-Folgearbeit. |
 | Architektur & Runtime | `V91`, `V92`, `V96`, `V100`, `V101`, `V102`, `V104`, `V105`, `V118`, `V125` | Runtime-Grenzen, Contracts, Typecheck, Legacy-Surface, UI-/Runtime-Entflechtung und Architektur-Gates. |
-| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V142`, `V144` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift- und Source-of-Truth-Gates. |
-| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core, AI-Kontext und Plan-Autopilot. |
+| Repo-Pflege & Governance | `V90`, `V109`, `V116`, `V117`, `V119`, `V123`, `V126`, `V138`, `V142`, `V144`, `V146`, `V148` | Governance, Planpflege, Toolchain, Evidence, Cleanup, Delivery-/Dev-, Agent-Diff-, Drift-, Test-/Fehlererkennungs- und Source-of-Truth-Gates. |
+| AI / Graph / Agenten-Werkzeuge | `V107`, `V110`, `V111`, `V120`, `V121`, `V122`, `V124`, `V127`, `V134`, `V136`, `V137`, `V139`, `V143`, `V147` | Wissensgraph, Graph-RAG, Agent-Memory, Plan-/Repo-Navigation, portabler Knowledge-Core, AI-Kontext und Plan-Autopilot. |
 
 ## Aktive Bloecke
 
@@ -86,11 +86,14 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V135 | Mobile Menue UX-Hardening und Start-Setup-Kompaktmodus | done | P2 | frei | V132.99 | 135.99 | `docs/plaene/aktiv/V135.md` |
 | V118 | Runtime-/UI-Entflechtung Slice 1 | planned | P2 | frei | V116.99,V117.99 | 118.1 | `docs/plaene/aktiv/V118.md` |
 | V127 | Repo Map Gesamtuebersicht, Plan-Map-Abhaengigkeiten und Wissensgraph-Verankerung | planned | P2 | frei | V107.99,V110.99,V111.99 | 127.1 | `docs/plaene/aktiv/V127.md` |
-| V131 | Mobile Classic Steuerung Hardening | active | P2 | frei | V112.99,V126.99,V72.99 | 131.4 | `docs/plaene/aktiv/V131.md` |
+| V131 | Mobile Classic Steuerung Hardening | done | P2 | frei | V112.99,V126.99,V72.99 | 131.99 | `docs/plaene/aktiv/V131.md` |
 | V136 | Portabler Knowledge-Core fuer Memory und RAG | planned | P1 | frei | V116.99,V117.99 | 136.1 | `docs/plaene/aktiv/V136.md` |
 | V142 | Graph-Drift-Guard-Automatisierung | planned | P2 | frei | V94.99,V116.99,V123.99,V138.99 | 142.1 | `docs/plaene/aktiv/V142.md` |
 | V143 | Agent-Skills statt Regeltext fuer Spezialroutinen | planned | P2 | frei | V116.99 | 143.1 | `docs/plaene/aktiv/V143.md` |
 | V144 | Future-Entscheidung JSON als Plan-Source-of-Truth | planned | P2 | frei | V123.99 | 144.1 | `docs/plaene/aktiv/V144.md` |
+| V146 | Electron-Major-Security-Slice (electron 42, electron-builder 26) | planned | P2 | frei | V90.99 | 146.1 | `docs/plaene/aktiv/V146.md` |
+| V147 | Plan-Autopilot isolierter Ein-Slice-Pilot | planned | P2 | frei | V117.99 | 147.0 | `docs/plaene/aktiv/V147.md` |
+| V148 | Test- und Fehlererkennungs-Automatisierung | planned | P2 | frei | V125.99,V138.99,V141.99,V142.99 | 148.1 | `docs/plaene/aktiv/V148.md` |
 
 ## Abhaengigkeiten
 
@@ -184,6 +187,12 @@ Dieser Abschnitt ist eine Navigationshilfe fuer Menschen, Agents und die Plan-Ma
 | V143 | V116.99 | hard | ja | Repo-Kontext-Reduktion ist Baseline fuer Agent-Skill-Auslagerung |
 | V144 | V123.99 | hard | ja | V123-Option-A-Entscheidung ist Voraussetzung fuer spaetere Source-of-Truth-Neubewertung |
 | V144 | V120.99,V134.99 | soft | ja | Graph-RAG- und Plan-Map-Piloten liefern Vergleichssignale fuer strukturierte Planpflege |
+| V146 | V90.99 | hard | ja | V90-Audit-Snapshots, 90.3.1-Matrixmethodik und P21-Restbefundlage sind Baseline fuer den Electron-Doppel-Major |
+| V147 | V117.99 | hard | ja | AI-Decision-Gates bilden die formale Master-Basis; der archivierte V145-Report-/Runner-Vertrag bleibt historische Baseline in `docs/plaene/alt/V145.md` |
+| V148 | V125.99 | hard | ja | Architektur-Compliance, staged Guard und risikoadjustierte Testauswahl sind Baseline |
+| V148 | V138.99 | hard | ja | Diff-Audit und ehrliche Not-checked-/Gate-Signale begrenzen neue Testautomation |
+| V148 | V141.99 | hard | ja | Testmapping- und Finding-/Doku-Drift-Pilot liefert die Status- und Mapping-Baseline |
+| V148 | V142.99 | hard | nein | Graph-/CI-Sync-Surfaces muessen vor der breiteren CI- und Testautomation geklaert sein |
 
 ## Lock-Status
 
@@ -232,25 +241,31 @@ Diese Tabelle ist der kompakte Index fuer Blocksicht im Master.
 | - | V135 | 2026-05-22 | closed | Abgeschlossen 2026-05-22; Fokus-/Scrollsprung, kompakter Start-Setup-CTA und Mobile-Route-Auswahl gruen |
 | - | V118 | - | frei | Geplant |
 | - | V127 | - | frei | Geplant |
-| - | V131 | 2026-06-10 | active | 131.1-131.3 abgeschlossen (useItem-Protokoll, Pause-/Back-Drift-Abschluss, Tilt-Kalibrierungszustand); 131.4 offen |
+| - | V131 | 2026-06-10 | closed | Abgeschlossen 2026-06-11; Orientation-Policy `sensorLandscape` (Match/Menue landscape-stabil), 90/270-Tilt-Mapping-Contracts gruen; Device-Rotations-Smoke bleibt manuelles Gate |
 | - | V136 | - | frei | Geplant |
 | - | V142 | - | frei | Geplant |
 | - | V143 | - | frei | Geplant |
 | - | V144 | - | frei | Geplant |
+| - | V146 | - | frei | Geplant; Ziel-Termin P21-Wiedervorlage 2026-07-11 |
+| - | V147 | - | frei | Geplant; Umsetzung erst nach Produktfokus-/Nutzungs-Gate und expliziter D3-Freigabe fuer den isolierten Pilot |
+| - | V148 | - | frei | Geplant; Start nach V142, V146 nur Soft-Handoff fuer Electron-/Windows-Signale |
 
 ## Empfohlene Reihenfolge
 
 Priorisierungsabgleich 2026-06-09: V140 und V141 sind abgeschlossen. Funktionale Mobile-Arbeit soll auf den neuen Zielmodulen aufsetzen; Governance-Folgearbeit darf die kalibrierten V141-WARN-Klassen nutzen, ohne Markdown- oder Finding-Autoritaet automatisch zu verschieben.
 
-1. `V131` als funktionale Mobile-Classic-Steuerungshaertung: Press-/Pause-/Tilt-/Orientation-Arbeit nutzt `TouchTiltSteeringOps`, `TouchTiltSensorLifecycle`, `TouchControlLayoutOps` und `MobileClassicMenuUi`.
+1. `V131` ist als funktionale Mobile-Classic-Steuerungshaertung abgeschlossen: useItem-Edge-Protokoll, Pause-/Back-Pfad, gefuehrte Tilt-Kalibrierung und `sensorLandscape`-Orientation-Policy; offen bleibt nur der manuelle Device-Smoke.
 2. `V118` bleibt der bevorzugte Architektur-Slice: `UIStartSyncController` kandidatenscharf gegen P14/P45, Consumer und kleinste Contract-/Runtime-Signale pruefen; Draft-/Intake-Altformulierungen in der aktiven Akte vor Umsetzung als Statusdrift behandeln.
 3. Produktspur: `V106` vor `V113`, weil GLB-Map-Varianz kleiner und weniger kollisionsreich ist. `V113` erst nach V76-Abgleich und nicht parallel zu `V118`/`V96`, da Start-Setup- und Hangar-Contracts geteilt werden.
 4. `V96` erst nach einem erfolgreichen kleinen Architektur-Proof (`V118`) oder als eng begrenzter Boundary-Slice; kein breiter Boundary-/Legacy-Block am Stueck.
 5. `V141` ist als WARN-Pilot abgeschlossen: Finding-/Plan-/Doku-Drift wird sichtbar, aber weder Findings noch Source-of-Truth-Entscheidungen werden automatisch geaendert.
 6. `V142` kann nun Graph-Generated-Gate und CI/Hook-Schutz auf Basis der kalibrierten Driftklassen haerten.
-7. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
-8. `V145` ist als separater Plan-Autopilot-MVP abgeschlossen und archiviert: Dry-run, Parser, Parking-Logik, Fake-Executor und Worker-Contract sind historische Abschluss-Evidence; produktiv erlaubt ist nur `npm run autopilot:plan`, der Live-Executor bleibt per Governance eingefroren.
-9. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
+7. `V148` folgt nach `V142`: zuerst Diff-zu-Test-Auswahl und Fehlerbericht-Lebenszyklus, danach Linux-/Windows-CI, Nightly sowie Coverage-/Fuzz-Piloten; V146 ist nur Soft-Handoff fuer aktuelle Electron-/Windows-Signale.
+8. `V136` vor `V122`, falls AI-/Memory-Arbeit priorisiert wird: erst portabler Knowledge-Core/Kernelschnitt, danach repo-natives Memory; Ruflo/MCP bleibt spaeterer User-Gate.
+9. `V145` ist als separater Plan-Autopilot-MVP abgeschlossen und archiviert: Dry-run, Parser, Parking-Logik, Fake-Executor und Worker-Contract sind historische Abschluss-Evidence; produktiv erlaubt ist nur `npm run autopilot:plan`, der Live-Executor bleibt per Governance eingefroren.
+10. `V127`, `V143` und `V144` nur nach konkretem Nutzenbeweis: Repo-/Plan-Map-Navigation, Agent-Skill-Auslagerung und JSON-Source-of-Truth-Entscheidung bleiben nachrangig. `V144` bleibt explizit Future-Entscheidung; Markdown bleibt kanonisch bis separater D3/D4-Gate.
+11. `V146` ist terminiert statt priorisiert: Der Electron-Doppel-Major (electron-builder 26 vor electron 42) soll zur P21-Wiedervorlage 2026-07-11 starten oder frueher, wenn ein non-force-Kandidat auftaucht; Details in `docs/plaene/aktiv/V146.md`.
+12. `V147` ist als Plan-Autopilot-Reaktivierung geplant, aber nachrangig: Start erst nach Produktfokus-/Nutzungs-Gate oder expliziter User-Aufhebung des Meta-Moratoriums; Details in `docs/plaene/aktiv/V147.md`.
 
 ## Conflict-Log
 

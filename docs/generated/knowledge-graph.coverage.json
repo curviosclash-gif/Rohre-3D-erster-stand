@@ -186,19 +186,19 @@
     }
   ],
   "summary": {
-    "trackedFileCount": 2156,
-    "rawCoveredFileCount": 1398,
-    "rawCoveragePercent": 64.8,
-    "adjustedTrackedFileCount": 1463,
-    "adjustedCoveredFileCount": 1158,
+    "trackedFileCount": 2162,
+    "rawCoveredFileCount": 1403,
+    "rawCoveragePercent": 64.9,
+    "adjustedTrackedFileCount": 1467,
+    "adjustedCoveredFileCount": 1162,
     "adjustedCoveragePercent": 79.2,
-    "uncoveredFileCount": 758,
+    "uncoveredFileCount": 759,
     "uncoveredActiveFileCount": 305,
     "classifications": [
       {
         "classification": "agent-workflow",
         "excludedFromCoverage": true,
-        "count": 19,
+        "count": 21,
         "coveredCount": 11
       },
       {
@@ -216,14 +216,14 @@
       {
         "classification": "blocker-report",
         "excludedFromCoverage": true,
-        "count": 43,
-        "coveredCount": 2
+        "count": 44,
+        "coveredCount": 4
       },
       {
         "classification": "bot-training",
         "excludedFromCoverage": true,
-        "count": 220,
-        "coveredCount": 44
+        "count": 219,
+        "coveredCount": 43
       },
       {
         "classification": "dev-tooling",
@@ -264,8 +264,8 @@
       {
         "classification": "product-docs",
         "excludedFromCoverage": false,
-        "count": 347,
-        "coveredCount": 195
+        "count": 351,
+        "coveredCount": 199
       },
       {
         "classification": "prototype",
@@ -365,6 +365,7 @@
         "V125",
         "V143",
         "V144",
+        "V147",
         "V93",
         "V94"
       ],
@@ -510,6 +511,7 @@
         "V112",
         "V125",
         "V141",
+        "V148",
         "V88",
         "V89",
         "V90",
@@ -773,6 +775,32 @@
     },
     {
       "path": ".agents/workflows/release.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "agent-workflow",
+      "excludedFromCoverage": true,
+      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
+    },
+    {
+      "path": ".agents/workflows/repo-fix.md",
+      "tracked": true,
+      "coveredInCore": false,
+      "coveredByOverlay": false,
+      "covered": false,
+      "coverageSources": [],
+      "scopeBlocks": [],
+      "surfaces": [],
+      "classification": "agent-workflow",
+      "excludedFromCoverage": true,
+      "excludeReason": "Agent workflow documents are governance references, not product/code coverage targets."
+    },
+    {
+      "path": ".agents/workflows/repro-analyse.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
@@ -1091,6 +1119,7 @@
       ],
       "scopeBlocks": [
         "V142",
+        "V148",
         "V90",
         "V97"
       ],
@@ -6275,7 +6304,8 @@
         "scope-files"
       ],
       "scopeBlocks": [
-        "V145"
+        "V145",
+        "V147"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -11309,7 +11339,7 @@
       "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
-      "path": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
+      "path": "docs/Fehlerberichte/2026-06-11_v148-commit-blocked-by-parallel-plan-state.md",
       "tracked": true,
       "coveredInCore": false,
       "coveredByOverlay": false,
@@ -11322,13 +11352,34 @@
       "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
     },
     {
+      "path": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V148"
+      ],
+      "surfaces": [],
+      "classification": "blocker-report",
+      "excludedFromCoverage": true,
+      "excludeReason": "Task-specific blocker reports are evidence artifacts, not architecture coverage targets."
+    },
+    {
       "path": "docs/Fehlerberichte/README.md",
       "tracked": true,
-      "coveredInCore": false,
+      "coveredInCore": true,
       "coveredByOverlay": false,
-      "covered": false,
-      "coverageSources": [],
-      "scopeBlocks": [],
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V148"
+      ],
       "surfaces": [],
       "classification": "blocker-report",
       "excludedFromCoverage": true,
@@ -12418,6 +12469,60 @@
       "excludeReason": null
     },
     {
+      "path": "docs/plaene/aktiv/V146.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V146",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V147.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V147",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/aktiv/V148.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V148",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
       "path": "docs/plaene/aktiv/V64.md",
       "tracked": true,
       "coveredInCore": true,
@@ -12570,6 +12675,7 @@
       ],
       "scopeBlocks": [
         "V110",
+        "V146",
         "V77",
         "V90"
       ],
@@ -12734,6 +12840,23 @@
       "scopeBlocks": [
         "V110",
         "V116",
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/alt/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
         "V77"
       ],
       "surfaces": [],
@@ -13016,6 +13139,23 @@
     },
     {
       "path": "docs/plaene/alt/Feature_Editor_Map_Authoring_Contracts_V86.md",
+      "tracked": true,
+      "coveredInCore": true,
+      "coveredByOverlay": false,
+      "covered": true,
+      "coverageSources": [
+        "scope-files"
+      ],
+      "scopeBlocks": [
+        "V77"
+      ],
+      "surfaces": [],
+      "classification": "product-docs",
+      "excludedFromCoverage": false,
+      "excludeReason": null
+    },
+    {
+      "path": "docs/plaene/alt/Feature_Electron_Major_Security_Slice_V146.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -14256,6 +14396,7 @@
         "V137",
         "V138",
         "V141",
+        "V147",
         "V77",
         "V93"
       ],
@@ -14996,23 +15137,6 @@
       "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
     },
     {
-      "path": "docs/plaene/neu/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "bot-training",
-      "excludedFromCoverage": true,
-      "excludeReason": "Bot training data and plans are excluded from the main architecture graph."
-    },
-    {
       "path": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
       "tracked": true,
       "coveredInCore": true,
@@ -15083,23 +15207,6 @@
     },
     {
       "path": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
-      "tracked": true,
-      "coveredInCore": true,
-      "coveredByOverlay": false,
-      "covered": true,
-      "coverageSources": [
-        "scope-files"
-      ],
-      "scopeBlocks": [
-        "V77"
-      ],
-      "surfaces": [],
-      "classification": "product-docs",
-      "excludedFromCoverage": false,
-      "excludeReason": null
-    },
-    {
-      "path": "docs/plaene/neu/Feature_Electron_Major_Security_Slice_V146.md",
       "tracked": true,
       "coveredInCore": true,
       "coveredByOverlay": false,
@@ -15547,6 +15654,7 @@
         "V112",
         "V115",
         "V141",
+        "V146",
         "V90"
       ],
       "surfaces": [],
@@ -15578,6 +15686,7 @@
       ],
       "scopeBlocks": [
         "V141",
+        "V148",
         "V69"
       ],
       "surfaces": [],
@@ -16909,6 +17018,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V146",
         "V60",
         "V89",
         "V90"
@@ -16928,6 +17038,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V146",
         "V60",
         "V75",
         "V89",
@@ -17573,6 +17684,7 @@
         "scope-files"
       ],
       "scopeBlocks": [
+        "V148",
         "V90"
       ],
       "surfaces": [],
@@ -17602,6 +17714,7 @@
         "V141",
         "V142",
         "V145",
+        "V148",
         "V75",
         "V87",
         "V88",
@@ -20986,7 +21099,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V145"
+        "V145",
+        "V147"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -21103,7 +21217,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V145"
+        "V145",
+        "V147"
       ],
       "surfaces": [],
       "classification": "product-code",
@@ -35620,7 +35735,8 @@
       ],
       "scopeBlocks": [
         "B13",
-        "V145"
+        "V145",
+        "V147"
       ],
       "surfaces": [],
       "classification": "product-code",

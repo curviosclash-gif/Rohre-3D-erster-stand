@@ -1987,7 +1987,7 @@
       "id": "V131",
       "type": "block",
       "title": "Mobile Classic Steuerung Hardening",
-      "status": "active",
+      "status": "done",
       "attributes": {
         "source": [
           "block-plan",
@@ -1995,7 +1995,7 @@
         ],
         "priority": "P2",
         "owner": "frei",
-        "currentPhase": "131.4",
+        "currentPhase": "131.99",
         "planFile": "docs/plaene/aktiv/V131.md",
         "scopeDeclarations": [
           "android-classic/app/src/main/AndroidManifest.xml",
@@ -2449,6 +2449,7 @@
       "attributes": {
         "source": [
           "block-plan",
+          "dependency-target",
           "master-index"
         ],
         "priority": "P2",
@@ -2473,7 +2474,8 @@
         },
         "scopeOverlapAllowedWith": [
           "V141",
-          "V144"
+          "V144",
+          "V148"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
@@ -2517,7 +2519,8 @@
           "plannedCount": 6
         },
         "scopeOverlapAllowedWith": [
-          "V144"
+          "V144",
+          "V147"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
@@ -2565,7 +2568,8 @@
           "V127",
           "V141",
           "V142",
-          "V143"
+          "V143",
+          "V147"
         ],
         "unknownFrontmatterFields": [
           "scope_reference_files",
@@ -2603,6 +2607,126 @@
           "plannedCount": 1
         },
         "scopeOverlapAllowedWith": [],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V146",
+      "type": "block",
+      "title": "Electron-Major-Security-Slice (electron 42, electron-builder 26)",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "146.1",
+        "planFile": "docs/plaene/aktiv/V146.md",
+        "scopeDeclarations": [
+          "docs/plaene/aktiv/V146.md",
+          "docs/plaene/aktiv/V90.md",
+          "docs/prozess/Open_Findings.md",
+          "electron/package-lock.json",
+          "electron/package.json"
+        ],
+        "scopeResolution": {
+          "concreteCount": 5,
+          "plannedCount": 0
+        },
+        "scopeOverlapAllowedWith": [
+          "V90"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V147",
+      "type": "block",
+      "title": "Plan-Autopilot isolierter Ein-Slice-Pilot",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "147.0",
+        "planFile": "docs/plaene/aktiv/V147.md",
+        "scopeDeclarations": [
+          ".agents/rules/planning_and_governance.md",
+          "data/contracts/plan-autopilot-worker-output.v1.json",
+          "docs/plaene/aktiv/V147.md",
+          "docs/plaene/CHANGELOG.md",
+          "scripts/plan-autopilot.mjs",
+          "scripts/plan-autopilot/git-worktree.mjs",
+          "scripts/plan-autopilot/isolated-pilot.mjs",
+          "scripts/prompts/plan-autopilot-subphase.md",
+          "tests/plan-autopilot-isolated-pilot.contract.test.mjs",
+          "tests/plan-autopilot.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 7,
+          "plannedCount": 3
+        },
+        "scopeOverlapAllowedWith": [
+          "V143",
+          "V144",
+          "V148"
+        ],
+        "unknownFrontmatterFields": [
+          "scope_reference_files"
+        ]
+      }
+    },
+    {
+      "id": "V148",
+      "type": "block",
+      "title": "Test- und Fehlererkennungs-Automatisierung",
+      "status": "planned",
+      "attributes": {
+        "source": [
+          "block-plan",
+          "master-index"
+        ],
+        "priority": "P2",
+        "owner": "frei",
+        "currentPhase": "148.1",
+        "planFile": "docs/plaene/aktiv/V148.md",
+        "scopeDeclarations": [
+          ".agents/test_mapping.md",
+          ".github/workflows/ci.yml",
+          ".github/workflows/nightly-regression.yml",
+          "data/contracts/test-selection.v1.json",
+          "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
+          "docs/Fehlerberichte/README.md",
+          "docs/generated/error-report-index.json",
+          "docs/plaene/aktiv/V148.md",
+          "docs/qa/Manuelle_Testcheckliste_Spiel.md",
+          "package-lock.json",
+          "package.json",
+          "scripts/build-error-report-index.mjs",
+          "scripts/check-error-report-status.mjs",
+          "scripts/select-tests-for-diff.mjs",
+          "tests/error-report-index.contract.test.mjs",
+          "tests/test-selection.contract.test.mjs"
+        ],
+        "scopeResolution": {
+          "concreteCount": 8,
+          "plannedCount": 8
+        },
+        "scopeOverlapAllowedWith": [
+          "V142",
+          "V146",
+          "V147",
+          "V96"
+        ],
         "unknownFrontmatterFields": [
           "scope_reference_files"
         ]
@@ -3320,7 +3444,7 @@
           "vite.config.js"
         ],
         "scopeResolution": {
-          "concreteCount": 361,
+          "concreteCount": 364,
           "plannedCount": 0
         },
         "scopeOverlapAllowedWith": [],
@@ -4079,6 +4203,7 @@
           "V125",
           "V140",
           "V141",
+          "V148",
           "V90"
         ],
         "unknownFrontmatterFields": []
@@ -5304,7 +5429,7 @@
       "id": "V118.1",
       "type": "phase",
       "title": "Kandidatenauswahl und Scope-Freeze",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.1"
@@ -5314,7 +5439,7 @@
       "id": "V118.2",
       "type": "phase",
       "title": "Baseline und Testsignal",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.2"
@@ -5324,7 +5449,7 @@
       "id": "V118.3",
       "type": "phase",
       "title": "Entflechtungs-Slice",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.3"
@@ -5334,7 +5459,7 @@
       "id": "V118.4",
       "type": "phase",
       "title": "Abschluss und Folge-Slices",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.4"
@@ -6124,7 +6249,7 @@
       "id": "V131.4",
       "type": "phase",
       "title": "Orientation-Policy",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.4"
@@ -6134,7 +6259,7 @@
       "id": "V131.5",
       "type": "phase",
       "title": "Gates und Handoff",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.5"
@@ -6144,7 +6269,7 @@
       "id": "V131.99",
       "type": "phase",
       "title": "Abschluss-Gate",
-      "status": "open",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.99"
@@ -7038,6 +7163,206 @@
       "attributes": {
         "blockId": "V145",
         "phaseCode": "145.99"
+      }
+    },
+    {
+      "id": "V146.1",
+      "type": "phase",
+      "title": "Kompatibilitaets- und Engine-Matrix",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1"
+      }
+    },
+    {
+      "id": "V146.2",
+      "type": "phase",
+      "title": "electron-builder-Major (build-time)",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.2"
+      }
+    },
+    {
+      "id": "V146.3",
+      "type": "phase",
+      "title": "electron-Major (runtime)",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.3"
+      }
+    },
+    {
+      "id": "V146.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.99"
+      }
+    },
+    {
+      "id": "V147.0",
+      "type": "phase",
+      "title": "Intake- und Reaktivierungs-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0"
+      }
+    },
+    {
+      "id": "V147.1",
+      "type": "phase",
+      "title": "Baseline und Pilotvertrag",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1"
+      }
+    },
+    {
+      "id": "V147.2",
+      "type": "phase",
+      "title": "Modul-Extraktion und Worktree-Isolation",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2"
+      }
+    },
+    {
+      "id": "V147.3",
+      "type": "phase",
+      "title": "Scope- und Gate-Policy",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3"
+      }
+    },
+    {
+      "id": "V147.4",
+      "type": "phase",
+      "title": "CLI, Bericht und Fake-Pilot",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4"
+      }
+    },
+    {
+      "id": "V147.5",
+      "type": "phase",
+      "title": "Echter Ein-Slice-Pilot",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5"
+      }
+    },
+    {
+      "id": "V147.6",
+      "type": "phase",
+      "title": "Nutzwert-Pilotreihe",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6"
+      }
+    },
+    {
+      "id": "V147.99",
+      "type": "phase",
+      "title": "Abschlussentscheidung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99"
+      }
+    },
+    {
+      "id": "V148.1",
+      "type": "phase",
+      "title": "Baseline und Fehlertaxonomie",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1"
+      }
+    },
+    {
+      "id": "V148.2",
+      "type": "phase",
+      "title": "Diff-zu-Test-Auswahl",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2"
+      }
+    },
+    {
+      "id": "V148.3",
+      "type": "phase",
+      "title": "Linux-/Windows-CI-Matrix",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3"
+      }
+    },
+    {
+      "id": "V148.4",
+      "type": "phase",
+      "title": "Nightly-Regression und Fehlerartefakte",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4"
+      }
+    },
+    {
+      "id": "V148.5",
+      "type": "phase",
+      "title": "Coverage-, Fault-Seeding- und Property-/Fuzz-Pilot",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5"
+      }
+    },
+    {
+      "id": "V148.6",
+      "type": "phase",
+      "title": "Fehlerbericht-Lebenszyklus",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6"
+      }
+    },
+    {
+      "id": "V148.7",
+      "type": "phase",
+      "title": "Nutzwert- und Gate-Kalibrierung",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7"
+      }
+    },
+    {
+      "id": "V148.99",
+      "type": "phase",
+      "title": "Abschluss-Gate",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99"
       }
     },
     {
@@ -13197,8 +13522,8 @@
     {
       "id": "V118.1.1",
       "type": "subphase",
-      "title": "`src/ui/UIStartSyncController.js` mit `query-knowledge-graph` pruefen: `why-file`, `impact-for-file`, `surfaces-for-file`, `coverage-report`; `event-flow` nur, wenn neue Critical-Path-Kanten sichtbar werden.",
-      "status": "open",
+      "title": "`src/ui/UIStartSyncController.js` mit `query-knowledge-graph` pruefen: `why-file`, `impact-for-file`, `surfaces-for-file`, `coverage-report`; `event-flow` nur, wenn neue Critical-Path-Kanten sichtbar werden. (abgeschlossen: 2026-06-21; evidence: why-file -> covered product-code mit V118-Scope; surfaces-for-file -> []; coverage-report -> PASS new uncovered active 0; impact-for-file -> keine Critical Paths; npm run graph:check -> PASS; Review-Subagent Mencius -> PASS)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.1",
@@ -13208,8 +13533,8 @@
     {
       "id": "V118.1.2",
       "type": "subphase",
-      "title": "Offene Findings aus `docs/prozess/Open_Findings.md` und V116.7-`Do not touch yet`-Tabelle abgleichen.",
-      "status": "open",
+      "title": "Offene Findings aus `docs/prozess/Open_Findings.md` und V116.7-`Do not touch yet`-Tabelle abgleichen. (abgeschlossen: 2026-06-21; evidence: Open_Findings -> P14 direkt fuer `UIStartSyncController`; P45 gesplittet: Audio-Test-Isolation nicht V118-Scope, Architektur-Hotspot-Anteil nur fuer `UIStartSyncController`/nahe UI-Pfade relevant; V116.7 bestaetigt `UIStartSyncController` als Rang-1-Kandidat, `UIManager` nur als minimaler Snapshot-Aufrufer/kein eigener Kandidat, `ArcadeVehicleManager` wegen V113/Hangar, `MediaRecorderSystem` wegen V105/P48 und `ArcadeRunRuntime` wegen V112/V96 out-of-scope; Review-Subagent Boyle -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.1",
@@ -13219,8 +13544,8 @@
     {
       "id": "V118.1.3",
       "type": "subphase",
-      "title": "`UIStartSyncController` als einzigen Kandidaten bestaetigen und `UIManager`, `ArcadeVehicleManager`, `MediaRecorderSystem` und `ArcadeRunRuntime` explizit out-of-scope lassen.",
-      "status": "open",
+      "title": "`UIStartSyncController` als einzigen Kandidaten bestaetigen und `UIManager`, `ArcadeVehicleManager`, `MediaRecorderSystem` und `ArcadeRunRuntime` explizit out-of-scope lassen. (abgeschlossen: 2026-06-21; evidence: `UIStartSyncController` als einziger Refactor-Kandidat bestaetigt; `UIManager` bleibt auf minimal notwendige Snapshot-Aufruf-/Weitergabestellen begrenzt, ohne eigenen Refactor; `ArcadeVehicleManager` (V113/Hangar-Legacy), `MediaRecorderSystem` (V105/P48 Recording-Hotpath) und `ArcadeRunRuntime` (V112/V96 Gameplay-Hotpath) bleiben out-of-scope; `graph:check` -> PASS; die von `open-deps V118` gemeldete offene V117-Abhaengigkeit ist Graph-Drift, da der kanonische Master V117 als `done/117.99` fuehrt und der Plan-Index dies bestaetigt; Review-Subagent Leibniz -> PASS mit Textkorrektur.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.1",
@@ -13230,8 +13555,8 @@
     {
       "id": "V118.1.4",
       "type": "subphase",
-      "title": "Blast-Radius nach V117 klassifizieren; bei D3/D4 stoppen und User-Freigabe einholen.",
-      "status": "open",
+      "title": "Blast-Radius nach V117 klassifizieren; bei D3/D4 stoppen und User-Freigabe einholen. (abgeschlossen: 2026-06-21; evidence: V117-Regel und `fix-planung` -> D3 wegen Workflow-Floor und Aktivplan-Evidence, technischer Slice enges D2; files=few, surface=runtime/tests/plan-evidence, reversibility=easy, user-visible-risk=medium; P14 bleibt mittleres Listener-/Idempotenzrisiko ohne erweiterten Fix-Claim; kein D4 mangels Deletes, Moves, Rebuilds, produktiver Parameter oder beabsichtigter Verhaltensaenderung; User-Gate fuer den genannten Scope explizit erteilt; `npm run plan:check` -> PASS; Review-Subagent Bohr -> PASS mit Textkorrektur.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.1",
@@ -13241,8 +13566,8 @@
     {
       "id": "V118.2.1",
       "type": "subphase",
-      "title": "Kleinste sinnvolle Signale festlegen: `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run test:contract`; `desktop-e2e -- core-runtime` nur bei sichtbarem Flow-Diff.",
-      "status": "open",
+      "title": "Kleinste sinnvolle Signale festlegen: `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run test:contract`; `desktop-e2e -- core-runtime` nur bei sichtbarem Flow-Diff. (abgeschlossen: 2026-06-21; evidence: identisches Vorher-/Nachher-Set aus Architecture-Boundaries, -Ratchet, -Typecheck und `test:contract`; `test:contract` schliesst `tests/runtime-regressions.contract.test.mjs` mit den relevanten UIManager-/UIStartSyncController-Vertraegen ein, ein zusaetzlicher direkter `node --test`-Lauf waere redundant; Desktop-E2E nur bei sichtbarem Flow-Diff; Review-Subagent Mendel -> PASS, Checks hier noch nicht ausgefuehrt.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.2",
@@ -13252,8 +13577,8 @@
     {
       "id": "V118.2.2",
       "type": "subphase",
-      "title": "Vorher-Signal ausfuehren oder blockerfest dokumentieren.",
-      "status": "open",
+      "title": "Vorher-Signal ausfuehren oder blockerfest dokumentieren. (abgeschlossen: 2026-06-21; evidence: `npm run check:architecture:boundaries` -> PASS; `npm run check:architecture:ratchet` -> PASS; `npm run typecheck:architecture` -> PASS; `npm run test:contract` -> PASS, 743/743 Tests. Arbeitsweisenfund im Baseline-Lauf: Codex-Subagent-Umgebung meldete `npm`-Pfadfehler, daher Orchestrator-Run lokal/sequenziell nach Gemini-Council-Freigabe; ausserdem hing `tests/graph-rag-viewer-ui.contract.test.mjs` bei fehlendem Playwright-Browser wegen offenem HTTP-Server, wurde als separater Teardown-Testfix bestaetigt; Plan-Map-Contract-Drift zu V120/V121/V131 wurde gegen den kanonischen Master aktualisiert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.2",
@@ -13263,8 +13588,8 @@
     {
       "id": "V118.2.3",
       "type": "subphase",
-      "title": "Riskante Randfaelle notieren: Setup-Control-Idempotenz, Listener-Dispose, Mode-/Map-/Vehicle-Snapshot, Multiplayer-Transport-UI, Restart/Return-to-Menu.",
-      "status": "open",
+      "title": "Riskante Randfaelle notieren: Setup-Control-Idempotenz, Listener-Dispose, Mode-/Map-/Vehicle-Snapshot, Multiplayer-Transport-UI, Restart/Return-to-Menu. (abgeschlossen: 2026-06-21; evidence: Setup-Control-Idempotenz haengt daran, dass alle Bindings ueber den injizierten `listen`-Callback in `_startSetupDisposers` landen; direkte `addEventListener` waeren Leak-/Doppelbinding-Risiko. Listener-Dispose bleibt auf `_startSetupDisposers`/`dispose()` begrenzt. Mode-/Map-/Vehicle-Snapshot ist synchron: `_activeSyncSnapshot` wird per `try/finally` gesetzt/zurueckgesetzt; Refactor darf keine async-Grenze einziehen und muss Writebacks ueber `readHangar*Selection`/`writeHangar*Selection` erhalten. Multiplayer-Transport-UI setzt Details-Open-State, Button-Disable/Title und Lobby-Text aus Session- und Transportzustand; manuelle UI-Interaktion darf nicht unbeabsichtigt ueberschrieben werden. Restart/Return-to-Menu muss alte Session-/`pendingMatchCommandId`-Zustaende sauber aus `_getMultiplayerSessionState()` verlieren, sonst bleibt `Startsignal gesendet` sichtbar. Baseline-Abdeckung: Architecture-Checks, `test:contract`, relevante UIManager/UIStartSyncController-Contracts und Playwright-Surface-Tests; Reviewer-Gemini -> PASS mit Hinweis auf expliziten Reset-Check.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.2",
@@ -13274,8 +13599,8 @@
     {
       "id": "V118.3.1",
       "type": "subphase",
-      "title": "Nur `UIStartSyncController`, direkt notwendige `src/ui/start-setup/*`-Helper, `UIManager`-Aufrufstellen und passende Tests anfassen.",
-      "status": "open",
+      "title": "Nur `UIStartSyncController`, direkt notwendige `src/ui/start-setup/*`-Helper, `UIManager`-Aufrufstellen und passende Tests anfassen. (abgeschlossen: 2026-06-21; evidence: Search-/Filter-Bindings aus `UIStartSyncController.setupStartSetupControls()` nach `src/ui/start-setup/StartSetupControlBindings.js` verschoben; kein `UIManager`-Diff, keine weiteren Runtime-/Feature-Dateien; Review-Gemini -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.3",
@@ -13285,8 +13610,8 @@
     {
       "id": "V118.3.2",
       "type": "subphase",
-      "title": "Keine Feature-Arbeit, kein Parameter-Tuning, keine opportunistische Formatierung.",
-      "status": "open",
+      "title": "Keine Feature-Arbeit, kein Parameter-Tuning, keine opportunistische Formatierung. (abgeschlossen: 2026-06-21; evidence: reiner Move-Code-Refactor ueber denselben `listen`-Disposer, `getSettings`, `ensureStartSetupLocalState` und `syncStartSetupState`-Callback; keine Settings-, Gameplay-, Multiplayer-, Recording- oder Parameterwerte geaendert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.3",
@@ -13296,8 +13621,8 @@
     {
       "id": "V118.3.3",
       "type": "subphase",
-      "title": "Nicht-offensichtliche Compatibility-Pfade mit Why-Kommentar und Delete-Kriterium dokumentieren; bestehende Port-/DOM-Binding-Vertraege bleiben kompatibel.",
-      "status": "open",
+      "title": "Nicht-offensichtliche Compatibility-Pfade mit Why-Kommentar und Delete-Kriterium dokumentieren; bestehende Port-/DOM-Binding-Vertraege bleiben kompatibel. (abgeschlossen: 2026-06-21; evidence: keine neuen Compatibility-/Fallback-Pfade eingefuehrt, daher kein neuer Inline-Why/Delete-Kommentar noetig; bestehender DOM-Binding-Vertrag bleibt ueber `bindStartSetupControls(controller, listen, getSettings)` und `_startSetupDisposers` kompatibel; Nachher-Signal `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run test:contract` -> PASS.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.3",
@@ -13307,8 +13632,8 @@
     {
       "id": "V118.4.1",
       "type": "subphase",
-      "title": "Vorher-/Nachher-Signal vergleichen.",
-      "status": "open",
+      "title": "Vorher-/Nachher-Signal vergleichen. (abgeschlossen: 2026-06-21; evidence: Vorher `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run test:contract` -> PASS; Nachher dieselben Signale -> PASS, `test:contract` 744/744 nach Governance-Testerweiterung; Architecture-Ratchet bleibt auf Baseline.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.4",
@@ -13318,8 +13643,8 @@
     {
       "id": "V118.4.2",
       "type": "subphase",
-      "title": "Abschluss-Evidence mit Datei, Gate, Ergebnis, Risiko und Fallback dokumentieren.",
-      "status": "open",
+      "title": "Abschluss-Evidence mit Datei, Gate, Ergebnis, Risiko und Fallback dokumentieren. (abgeschlossen: 2026-06-21; evidence: Dateien `src/ui/UIStartSyncController.js`, `src/ui/start-setup/StartSetupControlBindings.js`, `docs/plaene/aktiv/V118.md`; Gate `test:contract`/Architecture/Plan/Graph -> PASS; Ergebnis: Start-Setup-Search-/Filter-Bindings sind aus dem Controller in den vorhandenen Binding-Helper verschoben; Risiko: keine E2E-Sichtpruefung und kein reales Multiplayer-Return-to-Menu-Smoke; Fallback: Commit revert.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.4",
@@ -13329,8 +13654,8 @@
     {
       "id": "V118.4.3",
       "type": "subphase",
-      "title": "Maximal zwei Folge-Slices vorschlagen; keine Umsetzung in V118.",
-      "status": "open",
+      "title": "Maximal zwei Folge-Slices vorschlagen; keine Umsetzung in V118. (abgeschlossen: 2026-06-21; evidence: Folge-Slice 1: statische `setupVehicleSelects()`-Dropdown-Befuellung in einen Start-Setup-UiOps-Helper verschieben und `VEHICLE_DEFINITIONS`-Import aus dem Controller entfernen. Folge-Slice 2: vor einer Multiplayer-Transport-UI-Extraktion erst expliziten Reset-Contract fuer `pendingMatchCommandId`/`Startsignal gesendet` nach Return-to-Menu ergaenzen.)",
+      "status": "done",
       "attributes": {
         "blockId": "V118",
         "phaseCode": "118.4",
@@ -17322,8 +17647,8 @@
     {
       "id": "V131.4.1",
       "type": "subphase",
-      "title": "Produktentscheidung fuer Mobile Classic festhalten: bevorzugt Match-orientiert stabil, Menue nicht durch Rotation im Kampf verschieben.",
-      "status": "open",
+      "title": "Produktentscheidung festgehalten (User-Freigabe 2026-06-11, REVIEW-Gate): Mobile Classic Android laeuft match- und menuestabil in Landscape, beide Richtungen (`sensorLandscape`, ignoriert System-Rotationssperre); kein UI-Reflow durch Rotation im Kampf. Browser-Pfad bleibt bewusst orientation-frei mit 131.3-Re-Kalibrierung als Schutz. (abgeschlossen: 2026-06-11; evidence: User-Freigabe 2026-06-11 + dokumentierte `sensorLandscape`-Produktentscheidung)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.4",
@@ -17333,8 +17658,8 @@
     {
       "id": "V131.4.2",
       "type": "subphase",
-      "title": "Android-Manifest/MainActivity/Capacitor-Pfad so klein wie moeglich anpassen; keine breite Native-Rebuild-Strategie.",
-      "status": "open",
+      "title": "Minimal-native Umsetzung: einziges neues Attribut `android:screenOrientation=\"sensorLandscape\"` am Activity-Element der `AndroidManifest.xml` plus Why-Kommentar; MainActivity, Capacitor-Config und Gradle unveraendert, kein Rebuild-Pfad. (abgeschlossen: 2026-06-11; evidence: android-classic/app/src/main/AndroidManifest.xml)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.4",
@@ -17344,8 +17669,8 @@
     {
       "id": "V131.4.3",
       "type": "subphase",
-      "title": "Tilt-Mapping-Tests fuer die gewaehlte Zielorientierung nachziehen und bestehende Landscape-/Portrait-Annahmen dokumentieren.",
-      "status": "open",
+      "title": "Tilt-Mapping-Tests fuer beide Landscape-Richtungen nachgezogen: 90/270 mappen dieselbe physische Neigung spiegelbildlich (`yawAxis`-Symmetrie-Assertion); Manifest-Assertions (`screenOrientation`, `configChanges` mit `orientation`) im Native-Wrapper-Test. Annahmen dokumentiert: Android nutzt 90/270, `deriveTiltSteeringState` behaelt 0/180 fuer den Browser-Pfad (Kommentar am Mapping-Seam in `TouchTiltSteeringOps.js`). (abgeschlossen: 2026-06-11; evidence: tests/mobile-classic-app.contract.test.mjs)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.4",
@@ -17355,8 +17680,8 @@
     {
       "id": "V131.5.1",
       "type": "subphase",
-      "title": "Gezielte Checks: `node --test tests/mobile-classic-app.contract.test.mjs`.",
-      "status": "open",
+      "title": "Gezielte Checks: `node --test tests/mobile-classic-app.contract.test.mjs` -> pass 25/25. (abgeschlossen: 2026-06-11; evidence: node --test tests/mobile-classic-app.contract.test.mjs -> PASS 25/25; npm run plan:check -> PASS; npm run graph:check -> PASS; npm run gates:pre-commit -> PASS mit V146-WARN)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.5",
@@ -17366,8 +17691,8 @@
     {
       "id": "V131.5.2",
       "type": "subphase",
-      "title": "Wenn native Android-Dateien geaendert wurden: `npm run app:classic:android:assets:check` und, falls Device verfuegbar, manueller `app:classic:android:install`-Smoke.",
-      "status": "open",
+      "title": "Native Datei geaendert (Manifest): `npm run app:classic:android:assets:check` -> assets fresh (36 files). Kein Device verfuegbar; `app:classic:android:install`-Smoke inkl. Rotations-/Tilt-Pruefung bleibt dokumentiertes manuelles Gate. (abgeschlossen: 2026-06-11; evidence: npm run app:classic:android:assets:check -> PASS assets fresh 36 files)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.5",
@@ -17377,8 +17702,8 @@
     {
       "id": "V131.5.3",
       "type": "subphase",
-      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md` mit Wirkung, Risiko und nicht geprueften Device-Punkten.",
-      "status": "open",
+      "title": "Abschlussnotiz in `docs/plaene/CHANGELOG.md` (Eintrag \"V131-Abschluss 2026-06-11\") mit Wirkung, Risiko und nicht geprueften Device-Punkten. (abgeschlossen: 2026-06-11; evidence: docs/plaene/CHANGELOG.md Eintrag \"V131-Abschluss 2026-06-11\")",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.5",
@@ -17388,8 +17713,8 @@
     {
       "id": "V131.99.1",
       "type": "subphase",
-      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest dokumentiert.",
-      "status": "open",
+      "title": "Alle vorherigen Phasen sind abgeschlossen; 131.2 war als Drift-Nachdokumentation bereits verifiziert. (abgeschlossen: 2026-06-11; evidence: V131-Phasen 131.1-131.5 status done)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.99",
@@ -17399,8 +17724,8 @@
     {
       "id": "V131.99.2",
       "type": "subphase",
-      "title": "Evidence pro Teilphase ist im aktiven V131-Plan verlinkt.",
-      "status": "open",
+      "title": "Evidence pro Teilphase ist in den Phasen-Checklisten dieses Plans verlinkt (Code-Seams, Testlauf-Ergebnisse, Gates). (abgeschlossen: 2026-06-11; evidence: V131-Checklisten 131.1-131.5 mit Evidence-Eintraegen)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.99",
@@ -17410,8 +17735,8 @@
     {
       "id": "V131.99.3",
       "type": "subphase",
-      "title": "Keine Punkt-4-Layout-Personalisierung ist in den Scope geraten.",
-      "status": "open",
+      "title": "Keine Punkt-4-Layout-Personalisierung im Scope: keine Button-Layout-/Skalierungs-/Profil-Settings im Diff. (abgeschlossen: 2026-06-11; evidence: V131-Scope ohne Layout-Personalisierungsdateien)",
+      "status": "done",
       "attributes": {
         "blockId": "V131",
         "phaseCode": "131.99",
@@ -21431,6 +21756,875 @@
         "blockId": "V145",
         "phaseCode": "145.99",
         "subphaseCode": "145.99.5"
+      }
+    },
+    {
+      "id": "V146.1.1",
+      "type": "subphase",
+      "title": "Vorab-Gate: `npm --prefix electron audit` erneut auf non-force-Kandidaten pruefen; falls inzwischen vorhanden, zuerst non-force fixen und Scope neu bewerten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1",
+        "subphaseCode": "146.1.1"
+      }
+    },
+    {
+      "id": "V146.1.2",
+      "type": "subphase",
+      "title": "Engine-/Breaking-Matrix fuer `electron-builder@26.15.2` (Node-Engines, squirrel-windows-/NSIS-Pfade, Config-Schema) und `electron@42.4.0` (Node-/Chromium-Stand, ASAR-Integrity, IPC-/Preload-Aenderungen) dokumentieren, inkl. Lese-Abgleich gegen `.github/workflows/ci.yml` (`node-version: lts/*`); falls die CI-Matrix selbst geaendert werden muss, vorher `scope_files` per Scope-Update erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1",
+        "subphaseCode": "146.1.2"
+      }
+    },
+    {
+      "id": "V146.1.3",
+      "type": "subphase",
+      "title": "Lokale Treffersuche fuer riskante APIs (`app.setAsDefaultProtocolClient`, `setLoginItemSettings`, Custom-Protocol-Handler, `webPreferences`) im `electron/`-Code.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1",
+        "subphaseCode": "146.1.3"
+      }
+    },
+    {
+      "id": "V146.2.1",
+      "type": "subphase",
+      "title": "`electron-builder@26.15.2` isoliert in `electron/` heben (Lockfile-Slice, eigener Commit).",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.2",
+        "subphaseCode": "146.2.1"
+      }
+    },
+    {
+      "id": "V146.2.2",
+      "type": "subphase",
+      "title": "Gates: `npm --prefix electron audit`, `npm run build:app`, `npm run app:package` (Packaging-Smoke); bei Rot `git revert` statt Patch-Eskalation.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.2",
+        "subphaseCode": "146.2.2"
+      }
+    },
+    {
+      "id": "V146.3.1",
+      "type": "subphase",
+      "title": "`electron@42.4.0` isoliert heben (eigener Commit, getrennt von 146.2).",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.3",
+        "subphaseCode": "146.3.1"
+      }
+    },
+    {
+      "id": "V146.3.2",
+      "type": "subphase",
+      "title": "Gates: `npm run check:electron-renderer-drift`, `npm run test:desktop:smoke`, manueller App-Start (`npm run app:start`) mit Menu-/Match-Smoke.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.3",
+        "subphaseCode": "146.3.2"
+      }
+    },
+    {
+      "id": "V146.99.1",
+      "type": "subphase",
+      "title": "`npm --prefix electron audit --audit-level=low` gruen oder Reste mit GHSA, Kontext und neuer Wiedervorlage dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.99",
+        "subphaseCode": "146.99.1"
+      }
+    },
+    {
+      "id": "V146.99.2",
+      "type": "subphase",
+      "title": "V90-Snapshot-Folgeeintrag und P21-Status in `docs/prozess/Open_Findings.md` nachgezogen; `npm run docs:check` PASS.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.99",
+        "subphaseCode": "146.99.2"
+      }
+    },
+    {
+      "id": "V147.0.1",
+      "type": "subphase",
+      "title": "Meta-Moratorium gegen aktuelle Produktblock- und Tool-Nutzungs-Evidence pruefen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0",
+        "subphaseCode": "147.0.1"
+      }
+    },
+    {
+      "id": "V147.0.2",
+      "type": "subphase",
+      "title": "D3-Freigabe fuer Rule-Aenderung, Pilotbefehl und genau einen isolierten Pilot einholen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0",
+        "subphaseCode": "147.0.2"
+      }
+    },
+    {
+      "id": "V147.0.3",
+      "type": "subphase",
+      "title": "Dateien als `no-op`, `read-only evidence`, `optional` oder `edit required` klassifizieren; nur `edit required` in die Freigabe aufnehmen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0",
+        "subphaseCode": "147.0.3"
+      }
+    },
+    {
+      "id": "V147.1.1",
+      "type": "subphase",
+      "title": "Aktuellen Dry-run gegen offene Bloecke erfassen: Kandidaten, `missing_ai_gate`, Dirty- und Scope-Signale.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1",
+        "subphaseCode": "147.1.1"
+      }
+    },
+    {
+      "id": "V147.1.2",
+      "type": "subphase",
+      "title": "Temp-Git-Repo-Fixtures fuer disjunkte Host-Aenderung, Host-Overlap, detached Worktree und Worker-Commit anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1",
+        "subphaseCode": "147.1.2"
+      }
+    },
+    {
+      "id": "V147.1.3",
+      "type": "subphase",
+      "title": "Ergebnisvertrag fuer Run-ID, Ausgangs-HEAD, Worktree, Commit und Review-Optionen konkretisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1",
+        "subphaseCode": "147.1.3"
+      }
+    },
+    {
+      "id": "V147.2.1",
+      "type": "subphase",
+      "title": "Bestehende Runner-/Git-Helfer inventarisieren und nur die fuer Isolation noetigen Verantwortungen extrahieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.1"
+      }
+    },
+    {
+      "id": "V147.2.2",
+      "type": "subphase",
+      "title": "Detached Worktree auf festgehaltenem `HEAD` unter run-spezifischem `tmp/`-Pfad anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.2"
+      }
+    },
+    {
+      "id": "V147.2.3",
+      "type": "subphase",
+      "title": "Kein automatisches Remove/Clean implementieren; Retention und manuellen Review-Pfad berichten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.3"
+      }
+    },
+    {
+      "id": "V147.2.4",
+      "type": "subphase",
+      "title": "Entry-Point nur um Argumente und Delegation erweitern; Vorher-/Nachher-Zeilenzahl dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.4"
+      }
+    },
+    {
+      "id": "V147.3.1",
+      "type": "subphase",
+      "title": "Host-Dirty-Dateien gegen Master, Zielplan, Plan-Index, Lock-/Scope-Inputs und `allowedFiles` klassifizieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.1"
+      }
+    },
+    {
+      "id": "V147.3.2",
+      "type": "subphase",
+      "title": "`pilot-review-required` nur fuer explizit benannte D2-Slices mit konkreten Dateien und Checks erlauben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.2"
+      }
+    },
+    {
+      "id": "V147.3.3",
+      "type": "subphase",
+      "title": "Globs, Governance-Surfaces, Master-/Aktivplan-Edits, Deletes/Moves, produktive Parameter und rote Signale technisch parken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.3"
+      }
+    },
+    {
+      "id": "V147.3.4",
+      "type": "subphase",
+      "title": "Bestehende `validatePostWorkerGitState()`-Pruefung fuer isolierten Worktree wiederverwenden.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.4"
+      }
+    },
+    {
+      "id": "V147.4.1",
+      "type": "subphase",
+      "title": "Pilotbefehl mit Pflichtargumenten und hartem `--max-slices=1` verdrahten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.1"
+      }
+    },
+    {
+      "id": "V147.4.2",
+      "type": "subphase",
+      "title": "Fake-Pilot fuer `completed`, `gate_required`, `blocked`, `no_change`, Scope-Verletzung und Host-Overlap ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.2"
+      }
+    },
+    {
+      "id": "V147.4.3",
+      "type": "subphase",
+      "title": "Beweisen, dass Haupt-Worktree, Branch-Zeiger und fremde Aenderungen unveraendert bleiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.3"
+      }
+    },
+    {
+      "id": "V147.4.4",
+      "type": "subphase",
+      "title": "Report-only-Regel nur fuer den exakt begrenzten Pilotmodus anpassen; allgemeiner Live-Executor bleibt eingefroren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.4"
+      }
+    },
+    {
+      "id": "V147.5.1",
+      "type": "subphase",
+      "title": "User waehlt explizit einen kleinen D2-Slice aus V106, V113 oder V118.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.1"
+      }
+    },
+    {
+      "id": "V147.5.2",
+      "type": "subphase",
+      "title": "Pilot mit Codex-Executor starten; Worktree-Pfad und Ausgangs-HEAD protokollieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.2"
+      }
+    },
+    {
+      "id": "V147.5.3",
+      "type": "subphase",
+      "title": "Diff, Checks, Commit, `notChecked`, Host-Overlap und geparkte Gates manuell reviewen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.3"
+      }
+    },
+    {
+      "id": "V147.5.4",
+      "type": "subphase",
+      "title": "Ergebnis nur nach separater User-Entscheidung gezielt uebernehmen; der Pilot selbst integriert nichts.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.4"
+      }
+    },
+    {
+      "id": "V147.6.1",
+      "type": "subphase",
+      "title": "Insgesamt drei echte Ein-Slice-Piloten dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.1"
+      }
+    },
+    {
+      "id": "V147.6.2",
+      "type": "subphase",
+      "title": "Mindestens zwei verschiedene Produktbloecke abdecken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.2"
+      }
+    },
+    {
+      "id": "V147.6.3",
+      "type": "subphase",
+      "title": "Messen: Start-zu-Review-Zeit, manuelle Eingriffe, Scope-/Gate-Stopps, erfolgreiche Commit-Verifikation und tatsaechlich uebernommene Ergebnisse.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.3"
+      }
+    },
+    {
+      "id": "V147.6.4",
+      "type": "subphase",
+      "title": "Bei Scope-Verletzung, Governance-Bypass oder zwei nutzlosen/fehlerhaften Piloten sofort `freeze-again`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.4"
+      }
+    },
+    {
+      "id": "V147.99.1",
+      "type": "subphase",
+      "title": "Alle vorherigen Phasen sind abgeschlossen oder blockerfest als `hold` dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.1"
+      }
+    },
+    {
+      "id": "V147.99.2",
+      "type": "subphase",
+      "title": "Gezielte Contract-Tests und `npm run gates:pre-commit` sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.2"
+      }
+    },
+    {
+      "id": "V147.99.3",
+      "type": "subphase",
+      "title": "Haupt-Worktree-/Branch-Unveraendertheit und No-Merge-Vertrag sind belegt.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.3"
+      }
+    },
+    {
+      "id": "V147.99.4",
+      "type": "subphase",
+      "title": "Entscheidung `keep-pilot`, `expand-later` oder `freeze-again` ist mit Nutzwert-Evidence begruendet.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.4"
+      }
+    },
+    {
+      "id": "V147.99.5",
+      "type": "subphase",
+      "title": "`--max-slices>1`, automatische Integration und parallele Worker bleiben separate spaetere D3/D4-Entscheidungen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.5"
+      }
+    },
+    {
+      "id": "V148.1.1",
+      "type": "subphase",
+      "title": "Bestehende Scripts aus `package.json`, `.agents/test_mapping.md`, CI und Playwright-/Android-Harness inventarisieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.1"
+      }
+    },
+    {
+      "id": "V148.1.2",
+      "type": "subphase",
+      "title": "Fehlerklassen vereinheitlichen: `tooling`, `startup`, `readiness`, `contract`, `runtime-regression`, `platform`, `device`, `flake`, `coverage-gap`.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.2"
+      }
+    },
+    {
+      "id": "V148.1.3",
+      "type": "subphase",
+      "title": "Aktuelle CI-Laufzeit, Jobs, Plattform und nicht ausgefuehrte vorhandene Suiten dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.3"
+      }
+    },
+    {
+      "id": "V148.1.4",
+      "type": "subphase",
+      "title": "Referenzfaelle aus bestehenden Fehlerberichten waehlen, darunter Windows-Spawn, Max-Lines/Architektur, Graph-Drift und ein produktnaher Contract-Fehler.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.4"
+      }
+    },
+    {
+      "id": "V148.2.1",
+      "type": "subphase",
+      "title": "`test-selection.v1` mit Pfadklassen, Safety-Floors, Kostenklasse und erlaubten Commands definieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.1"
+      }
+    },
+    {
+      "id": "V148.2.2",
+      "type": "subphase",
+      "title": "`select-tests-for-diff.mjs` auf expliziten Base-Ref oder Dateiliste begrenzen; keine versteckte Worktree-Mutation.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.2"
+      }
+    },
+    {
+      "id": "V148.2.3",
+      "type": "subphase",
+      "title": "Knowledge-Graph-`test-prioritization` als Kandidatensignal integrieren und leere/unsichere Ergebnisse mit deterministischem Fallback absichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.3"
+      }
+    },
+    {
+      "id": "V148.2.4",
+      "type": "subphase",
+      "title": "Contract-Tests fuer Core, UI, Netzwerk, Physics, Editor, Android, Docs und unbekannte Pfade erstellen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.4"
+      }
+    },
+    {
+      "id": "V148.2.5",
+      "type": "subphase",
+      "title": "`.agents/test_mapping.md` auf denselben Routing-Stand spiegeln und Driftcheck erweitern, ohne zwei unabhaengige Wahrheiten zu erzeugen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.5"
+      }
+    },
+    {
+      "id": "V148.3.1",
+      "type": "subphase",
+      "title": "Aktuelle Ubuntu-Lane in wiederverwendbare Schritte schneiden, ohne bestehende Gates abzuschwaechen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.1"
+      }
+    },
+    {
+      "id": "V148.3.2",
+      "type": "subphase",
+      "title": "Windows-Job fuer Install, Plan/Docs, Architektur, Contracts und geeigneten Desktop-Smoke entwerfen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.2"
+      }
+    },
+    {
+      "id": "V148.3.3",
+      "type": "subphase",
+      "title": "Electron-/Playwright-Sandbox- und Display-Unterschiede pro Plattform explizit behandeln; kein Linux-Befehl blind auf Windows kopieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.3"
+      }
+    },
+    {
+      "id": "V148.3.4",
+      "type": "subphase",
+      "title": "Selector-Ausgabe als CI-Summary publizieren: ausgefuehrte, uebersprungene und manuell verbleibende Checks.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.4"
+      }
+    },
+    {
+      "id": "V148.3.5",
+      "type": "subphase",
+      "title": "Timeout- und Kostenbudget messen; instabile schwere Jobs nicht vorschnell als PR-Pflicht setzen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.5"
+      }
+    },
+    {
+      "id": "V148.4.1",
+      "type": "subphase",
+      "title": "`nightly-regression.yml` mit manueller Ausloesung und `schedule` anlegen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.1"
+      }
+    },
+    {
+      "id": "V148.4.2",
+      "type": "subphase",
+      "title": "Desktop-E2E, Browser-Compat, Physics und Editor-UI als getrennte Jobs mit eigenen Timeouts ausfuehren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.2"
+      }
+    },
+    {
+      "id": "V148.4.3",
+      "type": "subphase",
+      "title": "GPU-/Stress-/weitere Heavy-Diagnostics nur nach Runner-Eignung und Laufzeitmessung als eigene optionale Lane aufnehmen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.3"
+      }
+    },
+    {
+      "id": "V148.4.4",
+      "type": "subphase",
+      "title": "Logs, Screenshots, Traces, Summary und Failure-Taxonomie pro rotem Job als Artefakt sichern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.4"
+      }
+    },
+    {
+      "id": "V148.4.5",
+      "type": "subphase",
+      "title": "Wiederholte Flakes von reproduzierbaren Regressionen trennen; Rerun darf den ersten Fehler nicht verdecken.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.5"
+      }
+    },
+    {
+      "id": "V148.5.1",
+      "type": "subphase",
+      "title": "Node-eigene Coverage gegen `c8` fuer die aktuelle Node-/ESM-Struktur vergleichen; kleinste stabile Variante waehlen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.1"
+      }
+    },
+    {
+      "id": "V148.5.2",
+      "type": "subphase",
+      "title": "Coverage-Baseline fuer ausgewaehlte Contract-/Core-Pfade erfassen; zunaechst report-only, keine globale Prozentvorgabe.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.2"
+      }
+    },
+    {
+      "id": "V148.5.3",
+      "type": "subphase",
+      "title": "Fault-Seeding-Matrix mit kleinen reproduzierbaren Defekten erstellen, zum Beispiel invertierte Boolean-/Integer-Uebersetzung, fehlender Clamp und verlorener State-Transition.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.3"
+      }
+    },
+    {
+      "id": "V148.5.4",
+      "type": "subphase",
+      "title": "Property-/Fuzz-Pilot fuer mindestens zwei reine Vertragsklassen umsetzen, bevorzugt Parser/Normalizer und Zustands-/Protokollinvarianten.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.4"
+      }
+    },
+    {
+      "id": "V148.5.5",
+      "type": "subphase",
+      "title": "Seed, Minimal-Repro, Iterationsbudget und Timeout in Artefakten festhalten; Domain-Ausbau als Handoff an Produktbloecke dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.5"
+      }
+    },
+    {
+      "id": "V148.6.1",
+      "type": "subphase",
+      "title": "README und Template um Status, Last-verified, Owner-scope, Recheck-command, Resolution-evidence und Next-step erweitern.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.1"
+      }
+    },
+    {
+      "id": "V148.6.2",
+      "type": "subphase",
+      "title": "`error-report-index.v1` als generiertes Statussignal entwerfen; Berichte bleiben kanonische Detailquelle.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.2"
+      }
+    },
+    {
+      "id": "V148.6.3",
+      "type": "subphase",
+      "title": "Builder und Check fuer `open`, `resolved`, `stale`, `cannot-reproduce` und `legacy-unknown` implementieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.3"
+      }
+    },
+    {
+      "id": "V148.6.4",
+      "type": "subphase",
+      "title": "Historische Berichte anfangs nur warnend behandeln; neueste offene Berichte gezielt revalidieren statt alle Dateien mechanisch umzuschreiben.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.4"
+      }
+    },
+    {
+      "id": "V148.6.5",
+      "type": "subphase",
+      "title": "Wiederholte CI-/Nightly-Fehler duerfen einen Berichtsentwurf oder klaren Next-Step vorschlagen, aber keinen kanonischen Bericht automatisch anlegen oder schliessen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.5"
+      }
+    },
+    {
+      "id": "V148.7.1",
+      "type": "subphase",
+      "title": "Referenzfehler gegen alte und neue Lane vergleichen: erkannt, nicht erkannt, falscher Alarm, Laufzeit.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.1"
+      }
+    },
+    {
+      "id": "V148.7.2",
+      "type": "subphase",
+      "title": "Linux-/Windows-Differenzen, Flake-Rate und Artefaktqualitaet ueber mehrere Laeufe messen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.2"
+      }
+    },
+    {
+      "id": "V148.7.3",
+      "type": "subphase",
+      "title": "Nur rauscharme Fast-Lane-Signale als harte PR-/Push-Gates vorschlagen; schwere oder instabile Checks Nightly lassen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.3"
+      }
+    },
+    {
+      "id": "V148.7.4",
+      "type": "subphase",
+      "title": "Offene Erkennungsluecken mit Zielblock, kleinstem Testsignal und manueller Restpruefung dokumentieren.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.4"
+      }
+    },
+    {
+      "id": "V148.99.1",
+      "type": "subphase",
+      "title": "Selector- und Fehlerbericht-Contract-Tests sind gruen.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.1"
+      }
+    },
+    {
+      "id": "V148.99.2",
+      "type": "subphase",
+      "title": "Linux-/Windows-Fast-Lane ist in mindestens drei aufeinanderfolgenden Referenzlaeufen stabil oder blockerfest klassifiziert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.2"
+      }
+    },
+    {
+      "id": "V148.99.3",
+      "type": "subphase",
+      "title": "Nightly-Profil wurde mindestens einmal vollstaendig ausgefuehrt; rote Ergebnisse besitzen Artefakte und Failure-Klasse.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.3"
+      }
+    },
+    {
+      "id": "V148.99.4",
+      "type": "subphase",
+      "title": "Coverage-/Fault-Seeding-/Property-Pilot nennt konkrete gefundene oder bewusst nicht gefundene Fehler.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.4"
+      }
+    },
+    {
+      "id": "V148.99.5",
+      "type": "subphase",
+      "title": "`npm run plan:check`, `npm run check:plan-evidence-claims`, relevante Contract-/Desktop-Signale und `npm run gates:pre-commit` sind gruen oder blockerfest dokumentiert.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.5"
+      }
+    },
+    {
+      "id": "V148.99.6",
+      "type": "subphase",
+      "title": "Abschlussnotiz und Masterstatus nennen dauerhafte Pflichtgates, Nightly-Lanes, manuelle Device-Reste, False-Positive-Budget und naechste Domain-Handoffs.",
+      "status": "open",
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.6"
       }
     },
     {
@@ -31859,6 +33053,7 @@
           "V125",
           "V143",
           "V144",
+          "V147",
           "V93",
           "V94"
         ],
@@ -31929,6 +33124,7 @@
           "V112",
           "V125",
           "V141",
+          "V148",
           "V88",
           "V89",
           "V90",
@@ -32321,10 +33517,26 @@
         ],
         "scopeBlocks": [
           "V142",
+          "V148",
           "V90",
           "V97"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": ".github/workflows/nightly-regression.yml",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
       }
     },
     {
@@ -34859,9 +36071,25 @@
           "scope-files"
         ],
         "scopeBlocks": [
-          "V145"
+          "V145",
+          "V147"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "data/contracts/test-selection.v1.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
       }
     },
     {
@@ -35284,6 +36512,51 @@
           "V115"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/Fehlerberichte/README.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/generated/error-report-index.json",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
       }
     },
     {
@@ -36194,6 +37467,54 @@
       }
     },
     {
+      "id": "docs/plaene/aktiv/V146.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V146",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V147.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V147",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/aktiv/V148.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
       "id": "docs/plaene/aktiv/V64.md",
       "type": "file",
       "title": null,
@@ -36378,6 +37699,7 @@
         ],
         "scopeBlocks": [
           "V110",
+          "V146",
           "V77",
           "V90"
         ],
@@ -36524,6 +37846,21 @@
         "scopeBlocks": [
           "V110",
           "V116",
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
           "V77"
         ],
         "exists": true
@@ -36772,6 +38109,21 @@
     },
     {
       "id": "docs/plaene/alt/Feature_Editor_Map_Authoring_Contracts_V86.md",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V77"
+        ],
+        "exists": true
+      }
+    },
+    {
+      "id": "docs/plaene/alt/Feature_Electron_Major_Security_Slice_V146.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -37872,6 +39224,7 @@
           "V137",
           "V138",
           "V141",
+          "V147",
           "V77",
           "V93"
         ],
@@ -38524,21 +39877,6 @@
       }
     },
     {
-      "id": "docs/plaene/neu/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
       "id": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
       "type": "file",
       "title": null,
@@ -38601,21 +39939,6 @@
     },
     {
       "id": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
-      "type": "file",
-      "title": null,
-      "status": "unknown",
-      "attributes": {
-        "source": [
-          "scope-files"
-        ],
-        "scopeBlocks": [
-          "V77"
-        ],
-        "exists": true
-      }
-    },
-    {
-      "id": "docs/plaene/neu/Feature_Electron_Major_Security_Slice_V146.md",
       "type": "file",
       "title": null,
       "status": "unknown",
@@ -39017,6 +40340,7 @@
           "V112",
           "V115",
           "V141",
+          "V146",
           "V90"
         ],
         "exists": true
@@ -39033,6 +40357,7 @@
         ],
         "scopeBlocks": [
           "V141",
+          "V148",
           "V69"
         ],
         "exists": true
@@ -40160,6 +41485,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V146",
           "V60",
           "V89",
           "V90"
@@ -40177,6 +41503,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V146",
           "V60",
           "V75",
           "V89",
@@ -40740,6 +42067,7 @@
           "scope-files"
         ],
         "scopeBlocks": [
+          "V148",
           "V90"
         ],
         "exists": true
@@ -40767,6 +42095,7 @@
           "V141",
           "V142",
           "V145",
+          "V148",
           "V75",
           "V87",
           "V88",
@@ -41252,6 +42581,21 @@
       }
     },
     {
+      "id": "scripts/build-error-report-index.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "scripts/build-knowledge-graph.mjs",
       "type": "file",
       "title": null,
@@ -41558,6 +42902,21 @@
           "B13"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/check-error-report-status.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
       }
     },
     {
@@ -42366,9 +43725,40 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V145"
+          "V145",
+          "V147"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/plan-autopilot/git-worktree.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V147"
+        ],
+        "exists": false
+      }
+    },
+    {
+      "id": "scripts/plan-autopilot/isolated-pilot.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V147"
+        ],
+        "exists": false
       }
     },
     {
@@ -42474,7 +43864,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V145"
+          "V145",
+          "V147"
         ],
         "exists": true
       }
@@ -42607,6 +43998,21 @@
           "V89"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "scripts/select-tests-for-diff.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
       }
     },
     {
@@ -54513,6 +55919,21 @@
       }
     },
     {
+      "id": "tests/error-report-index.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/game-mode-strategy.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -55539,6 +56960,21 @@
       }
     },
     {
+      "id": "tests/plan-autopilot-isolated-pilot.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V147"
+        ],
+        "exists": false
+      }
+    },
+    {
       "id": "tests/plan-autopilot.contract.test.mjs",
       "type": "file",
       "title": null,
@@ -55550,7 +56986,8 @@
         ],
         "scopeBlocks": [
           "B13",
-          "V145"
+          "V145",
+          "V147"
         ],
         "exists": true
       }
@@ -56049,6 +57486,21 @@
           "V141"
         ],
         "exists": true
+      }
+    },
+    {
+      "id": "tests/test-selection.contract.test.mjs",
+      "type": "file",
+      "title": null,
+      "status": "unknown",
+      "attributes": {
+        "source": [
+          "scope-files"
+        ],
+        "scopeBlocks": [
+          "V148"
+        ],
+        "exists": false
       }
     },
     {
@@ -96062,6 +97514,1462 @@
       }
     },
     {
+      "from": "V146",
+      "to": "docs/plaene/aktiv/V146.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "docs/plaene/aktiv/V90.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "docs/prozess/Open_Findings.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "electron/package-lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "electron/package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "V146.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "V146.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.2"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "V146.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.3"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "V146.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.99"
+      }
+    },
+    {
+      "from": "V146",
+      "to": "V90",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "V90-Audit-Snapshots, 90.3.1-Matrixmethodik und P21-Restbefundlage sind Baseline fuer den Electron-Doppel-Major",
+      "attributes": {
+        "dependsPhase": "90.99",
+        "rawToken": "V90.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V146.1",
+      "to": "V146.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1",
+        "subphaseCode": "146.1.1"
+      }
+    },
+    {
+      "from": "V146.1",
+      "to": "V146.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1",
+        "subphaseCode": "146.1.2"
+      }
+    },
+    {
+      "from": "V146.1",
+      "to": "V146.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.1",
+        "subphaseCode": "146.1.3"
+      }
+    },
+    {
+      "from": "V146.2",
+      "to": "V146.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.2",
+        "subphaseCode": "146.2.1"
+      }
+    },
+    {
+      "from": "V146.2",
+      "to": "V146.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.2",
+        "subphaseCode": "146.2.2"
+      }
+    },
+    {
+      "from": "V146.3",
+      "to": "V146.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.3",
+        "subphaseCode": "146.3.1"
+      }
+    },
+    {
+      "from": "V146.3",
+      "to": "V146.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.3",
+        "subphaseCode": "146.3.2"
+      }
+    },
+    {
+      "from": "V146.99",
+      "to": "V146.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.99",
+        "subphaseCode": "146.99.1"
+      }
+    },
+    {
+      "from": "V146.99",
+      "to": "V146.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V146",
+        "phaseCode": "146.99",
+        "subphaseCode": "146.99.2"
+      }
+    },
+    {
+      "from": "V147",
+      "to": ".agents/rules/planning_and_governance.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "data/contracts/plan-autopilot-worker-output.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "docs/plaene/aktiv/V147.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "docs/plaene/CHANGELOG.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "scripts/plan-autopilot.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "scripts/plan-autopilot/git-worktree.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "scripts/plan-autopilot/isolated-pilot.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "scripts/prompts/plan-autopilot-subphase.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "tests/plan-autopilot-isolated-pilot.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "tests/plan-autopilot.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V117",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "AI-Decision-Gates bilden die formale Master-Basis; der archivierte V145-Report-/Runner-Vertrag bleibt historische Baseline in `docs/plaene/alt/V145.md`",
+      "attributes": {
+        "dependsPhase": "117.99",
+        "rawToken": "V117.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.0",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6"
+      }
+    },
+    {
+      "from": "V147",
+      "to": "V147.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99"
+      }
+    },
+    {
+      "from": "V147.0",
+      "to": "V147.0.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0",
+        "subphaseCode": "147.0.1"
+      }
+    },
+    {
+      "from": "V147.0",
+      "to": "V147.0.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0",
+        "subphaseCode": "147.0.2"
+      }
+    },
+    {
+      "from": "V147.0",
+      "to": "V147.0.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.0",
+        "subphaseCode": "147.0.3"
+      }
+    },
+    {
+      "from": "V147.1",
+      "to": "V147.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1",
+        "subphaseCode": "147.1.1"
+      }
+    },
+    {
+      "from": "V147.1",
+      "to": "V147.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1",
+        "subphaseCode": "147.1.2"
+      }
+    },
+    {
+      "from": "V147.1",
+      "to": "V147.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.1",
+        "subphaseCode": "147.1.3"
+      }
+    },
+    {
+      "from": "V147.2",
+      "to": "V147.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.1"
+      }
+    },
+    {
+      "from": "V147.2",
+      "to": "V147.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.2"
+      }
+    },
+    {
+      "from": "V147.2",
+      "to": "V147.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.3"
+      }
+    },
+    {
+      "from": "V147.2",
+      "to": "V147.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.2",
+        "subphaseCode": "147.2.4"
+      }
+    },
+    {
+      "from": "V147.3",
+      "to": "V147.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.1"
+      }
+    },
+    {
+      "from": "V147.3",
+      "to": "V147.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.2"
+      }
+    },
+    {
+      "from": "V147.3",
+      "to": "V147.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.3"
+      }
+    },
+    {
+      "from": "V147.3",
+      "to": "V147.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.3",
+        "subphaseCode": "147.3.4"
+      }
+    },
+    {
+      "from": "V147.4",
+      "to": "V147.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.1"
+      }
+    },
+    {
+      "from": "V147.4",
+      "to": "V147.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.2"
+      }
+    },
+    {
+      "from": "V147.4",
+      "to": "V147.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.3"
+      }
+    },
+    {
+      "from": "V147.4",
+      "to": "V147.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.4",
+        "subphaseCode": "147.4.4"
+      }
+    },
+    {
+      "from": "V147.5",
+      "to": "V147.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.1"
+      }
+    },
+    {
+      "from": "V147.5",
+      "to": "V147.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.2"
+      }
+    },
+    {
+      "from": "V147.5",
+      "to": "V147.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.3"
+      }
+    },
+    {
+      "from": "V147.5",
+      "to": "V147.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.5",
+        "subphaseCode": "147.5.4"
+      }
+    },
+    {
+      "from": "V147.6",
+      "to": "V147.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.1"
+      }
+    },
+    {
+      "from": "V147.6",
+      "to": "V147.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.2"
+      }
+    },
+    {
+      "from": "V147.6",
+      "to": "V147.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.3"
+      }
+    },
+    {
+      "from": "V147.6",
+      "to": "V147.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.6",
+        "subphaseCode": "147.6.4"
+      }
+    },
+    {
+      "from": "V147.99",
+      "to": "V147.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.1"
+      }
+    },
+    {
+      "from": "V147.99",
+      "to": "V147.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.2"
+      }
+    },
+    {
+      "from": "V147.99",
+      "to": "V147.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.3"
+      }
+    },
+    {
+      "from": "V147.99",
+      "to": "V147.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.4"
+      }
+    },
+    {
+      "from": "V147.99",
+      "to": "V147.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V147",
+        "phaseCode": "147.99",
+        "subphaseCode": "147.99.5"
+      }
+    },
+    {
+      "from": "V148",
+      "to": ".agents/test_mapping.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": ".github/workflows/ci.yml",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": ".github/workflows/nightly-regression.yml",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "data/contracts/test-selection.v1.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "docs/Fehlerberichte/FEHLERBERICHT_TEMPLATE.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "docs/Fehlerberichte/README.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "docs/generated/error-report-index.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "docs/plaene/aktiv/V148.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "docs/qa/Manuelle_Testcheckliste_Spiel.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "package-lock.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "package.json",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "scripts/build-error-report-index.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "scripts/check-error-report-status.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "scripts/select-tests-for-diff.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "tests/error-report-index.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "tests/test-selection.contract.test.mjs",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V125",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Architektur-Compliance, staged Guard und risikoadjustierte Testauswahl sind Baseline",
+      "attributes": {
+        "dependsPhase": "125.99",
+        "rawToken": "V125.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V138",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Diff-Audit und ehrliche Not-checked-/Gate-Signale begrenzen neue Testautomation",
+      "attributes": {
+        "dependsPhase": "138.99",
+        "rawToken": "V138.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V141",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": true,
+      "hint": "Testmapping- und Finding-/Doku-Drift-Pilot liefert die Status- und Mapping-Baseline",
+      "attributes": {
+        "dependsPhase": "141.99",
+        "rawToken": "V141.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V142",
+      "type": "depends_on",
+      "source": "merged",
+      "hard": true,
+      "fulfilled": false,
+      "hint": "Graph-/CI-Sync-Surfaces muessen vor der breiteren CI- und Testautomation geklaert sein",
+      "attributes": {
+        "dependsPhase": "142.99",
+        "rawToken": "V142.99",
+        "sourceBreakdown": [
+          "frontmatter",
+          "master-table"
+        ],
+        "canonicalToken": true
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.1",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.2",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.3",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.4",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.5",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.6",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.7",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7"
+      }
+    },
+    {
+      "from": "V148",
+      "to": "V148.99",
+      "type": "contains_phase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99"
+      }
+    },
+    {
+      "from": "V148.1",
+      "to": "V148.1.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.1"
+      }
+    },
+    {
+      "from": "V148.1",
+      "to": "V148.1.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.2"
+      }
+    },
+    {
+      "from": "V148.1",
+      "to": "V148.1.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.3"
+      }
+    },
+    {
+      "from": "V148.1",
+      "to": "V148.1.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.1",
+        "subphaseCode": "148.1.4"
+      }
+    },
+    {
+      "from": "V148.2",
+      "to": "V148.2.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.1"
+      }
+    },
+    {
+      "from": "V148.2",
+      "to": "V148.2.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.2"
+      }
+    },
+    {
+      "from": "V148.2",
+      "to": "V148.2.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.3"
+      }
+    },
+    {
+      "from": "V148.2",
+      "to": "V148.2.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.4"
+      }
+    },
+    {
+      "from": "V148.2",
+      "to": "V148.2.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.2",
+        "subphaseCode": "148.2.5"
+      }
+    },
+    {
+      "from": "V148.3",
+      "to": "V148.3.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.1"
+      }
+    },
+    {
+      "from": "V148.3",
+      "to": "V148.3.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.2"
+      }
+    },
+    {
+      "from": "V148.3",
+      "to": "V148.3.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.3"
+      }
+    },
+    {
+      "from": "V148.3",
+      "to": "V148.3.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.4"
+      }
+    },
+    {
+      "from": "V148.3",
+      "to": "V148.3.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.3",
+        "subphaseCode": "148.3.5"
+      }
+    },
+    {
+      "from": "V148.4",
+      "to": "V148.4.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.1"
+      }
+    },
+    {
+      "from": "V148.4",
+      "to": "V148.4.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.2"
+      }
+    },
+    {
+      "from": "V148.4",
+      "to": "V148.4.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.3"
+      }
+    },
+    {
+      "from": "V148.4",
+      "to": "V148.4.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.4"
+      }
+    },
+    {
+      "from": "V148.4",
+      "to": "V148.4.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.4",
+        "subphaseCode": "148.4.5"
+      }
+    },
+    {
+      "from": "V148.5",
+      "to": "V148.5.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.1"
+      }
+    },
+    {
+      "from": "V148.5",
+      "to": "V148.5.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.2"
+      }
+    },
+    {
+      "from": "V148.5",
+      "to": "V148.5.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.3"
+      }
+    },
+    {
+      "from": "V148.5",
+      "to": "V148.5.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.4"
+      }
+    },
+    {
+      "from": "V148.5",
+      "to": "V148.5.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.5",
+        "subphaseCode": "148.5.5"
+      }
+    },
+    {
+      "from": "V148.6",
+      "to": "V148.6.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.1"
+      }
+    },
+    {
+      "from": "V148.6",
+      "to": "V148.6.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.2"
+      }
+    },
+    {
+      "from": "V148.6",
+      "to": "V148.6.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.3"
+      }
+    },
+    {
+      "from": "V148.6",
+      "to": "V148.6.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.4"
+      }
+    },
+    {
+      "from": "V148.6",
+      "to": "V148.6.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.6",
+        "subphaseCode": "148.6.5"
+      }
+    },
+    {
+      "from": "V148.7",
+      "to": "V148.7.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.1"
+      }
+    },
+    {
+      "from": "V148.7",
+      "to": "V148.7.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.2"
+      }
+    },
+    {
+      "from": "V148.7",
+      "to": "V148.7.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.3"
+      }
+    },
+    {
+      "from": "V148.7",
+      "to": "V148.7.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.7",
+        "subphaseCode": "148.7.4"
+      }
+    },
+    {
+      "from": "V148.99",
+      "to": "V148.99.1",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.1"
+      }
+    },
+    {
+      "from": "V148.99",
+      "to": "V148.99.2",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.2"
+      }
+    },
+    {
+      "from": "V148.99",
+      "to": "V148.99.3",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.3"
+      }
+    },
+    {
+      "from": "V148.99",
+      "to": "V148.99.4",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.4"
+      }
+    },
+    {
+      "from": "V148.99",
+      "to": "V148.99.5",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.5"
+      }
+    },
+    {
+      "from": "V148.99",
+      "to": "V148.99.6",
+      "type": "contains_subphase",
+      "hint": null,
+      "attributes": {
+        "blockId": "V148",
+        "phaseCode": "148.99",
+        "subphaseCode": "148.99.6"
+      }
+    },
+    {
       "from": "V51",
       "to": "docs/Umsetzungsplan.md",
       "type": "scope",
@@ -106506,6 +109414,33 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/aktiv/V146.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V147.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/aktiv/V148.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/aktiv/V64.md",
       "type": "scope",
       "hint": null,
@@ -106668,6 +109603,15 @@
     },
     {
       "from": "V77",
+      "to": "docs/plaene/alt/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
       "to": "docs/plaene/alt/Feature_AI_Decision_Framework.md",
       "type": "scope",
       "hint": null,
@@ -106813,6 +109757,15 @@
     {
       "from": "V77",
       "to": "docs/plaene/alt/Feature_Editor_Map_Authoring_Contracts_V86.md",
+      "type": "scope",
+      "hint": null,
+      "attributes": {
+        "declaredBy": "frontmatter"
+      }
+    },
+    {
+      "from": "V77",
+      "to": "docs/plaene/alt/Feature_Electron_Major_Security_Slice_V146.md",
       "type": "scope",
       "hint": null,
       "attributes": {
@@ -107838,15 +110791,6 @@
     },
     {
       "from": "V77",
-      "to": "docs/plaene/neu/BT96_Torch_Security_Bump_Intake_2026-06-11.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
       "to": "docs/plaene/neu/Feature_Agent_Skills_statt_Regeltext.md",
       "type": "scope",
       "hint": null,
@@ -107884,15 +110828,6 @@
     {
       "from": "V77",
       "to": "docs/plaene/neu/Feature_Cold_Short_Term_Memory_V122_Ergaenzung.md",
-      "type": "scope",
-      "hint": null,
-      "attributes": {
-        "declaredBy": "frontmatter"
-      }
-    },
-    {
-      "from": "V77",
-      "to": "docs/plaene/neu/Feature_Electron_Major_Security_Slice_V146.md",
       "type": "scope",
       "hint": null,
       "attributes": {
